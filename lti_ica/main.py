@@ -18,6 +18,7 @@ num_epoch = 350
 dt = 0.001
 lr = 3e-3
 batch_size = 512  # mini-batch size
+max_norm = 0.5
 apply_pca = True  # apply PCA for preprocessing or not
 # todo: turn PCA off
 

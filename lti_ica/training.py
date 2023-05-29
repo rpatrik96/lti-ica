@@ -5,7 +5,7 @@ import lti_ica.models
 
 
 def regularized_log_likelihood(data, num_segment, segment_means, segment_variances, num_epoch=1000, lr=1e-3,
-                               triangular=False):
+                               triangular=False, max_norm=0.5):
     """
     A function that takes data stratified into segments.
     Assuming each segment is distributed according to a multivariate Gaussian,
@@ -50,7 +50,7 @@ def regularized_log_likelihood(data, num_segment, segment_means, segment_varianc
 
             (-log_likelihood).backward()
             # clip the gradients
-            torch.nn.utils.clip_grad_norm_(model.parameters(), 0.5)
+            torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=max_norm)
 
             optimizer.step()
 
