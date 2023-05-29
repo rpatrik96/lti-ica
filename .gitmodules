@@ -1,0 +1,3 @@
+[submodule "state_space_models"]
+	path = state_space_models
+	url = https://github.com/rpatrik96/state-space-models
