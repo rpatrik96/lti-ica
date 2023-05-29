@@ -19,10 +19,10 @@ dt = 0.001
 lr = 3e-3
 batch_size = 512  # mini-batch size
 max_norm = 0.5
-apply_pca = True  # apply PCA for preprocessing or not
-# todo: turn PCA off
+num_experiment = 5
 
 import numpy as np
+import pandas as pd
 import torch
 
 import lti_ica.mcc
@@ -37,7 +37,6 @@ def data_gen(num_comp, dt, triangular):
 
     # Remake label for TCL learning
     num_segmentdata = int(np.ceil(num_data / num_segment))
-    y = np.tile(np.arange(num_segment), [num_segmentdata, 1]).T.reshape(-1)[:num_data]
 
     x, s = generate_nonstationary_data(lti, segment_means, segment_variances, num_comp, num_segmentdata, dt)
     return segment_means, segment_variances, x, s
@@ -60,13 +59,30 @@ if __name__ == '__main__':
     np.random.seed(random_seed)
     torch.manual_seed(random_seed)
 
-
-
     segment_means, segment_variances, x, s = data_gen(num_comp, dt, triangular)
 
-    model = regularized_log_likelihood(x.T, num_segment, segment_means, segment_variances, num_epoch=num_epoch, lr=lr)
+    mccs = []
 
-    # calculate MCC
-    mcc  = calc_mcc(model, x, s, ar_order)
+    # run experiments
+    for i in range(num_experiment):
+        model = regularized_log_likelihood(x.T, num_segment, segment_means, segment_variances, num_epoch=num_epoch,
+                                           lr=lr)
+        mccs.append(calc_mcc(model, x, s, ar_order))
 
+    filename = f"seed_{random_seed}_segment_{num_segment}_comp_{num_comp}_triangular_{triangular}.csv"
 
+    # convert mccs list to numpy and calculate mean and std
+    mccs = np.array(mccs)
+    mcc_mean = np.mean(mccs)
+    mcc_std = np.std(mccs)
+
+    # Define your data as a dictionary or a list of dictionaries
+    data = [{'mcc_mean': mcc_mean, "mcc_std": mcc_std, 'random_seed': random_seed, 'dt': dt, 'num_segment': num_segment,
+             'num_comp': num_comp, 'num_data': num_data, 'num_epoch': num_epoch, 'lr': lr,
+             'batch_size': batch_size, 'triangular': triangular}]
+
+    # Create a DataFrame from the data
+    df = pd.DataFrame(data)
+
+    # Save the DataFrame to a CSV file with column names
+    df.to_csv(filename, index=False, header=True, mode='a')
