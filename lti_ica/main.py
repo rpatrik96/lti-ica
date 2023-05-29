@@ -6,40 +6,20 @@
 # =============================================================
 
 # Data generation ---------------------------------------------
-num_layer = 3  # number of layers of mixing-MLP
 num_comp = 3  # number of components (dimension)
 num_data = 2 ** 14  # number of data points
-num_basis = 64  # number of frequencies of fourier bases
-modulate_range = [-2, 2]
-modulate_range2 = [-2, 2]
 ar_order = 1
 random_seed = 42  # random seed
 triangular = True
 num_segment = 16  # learn by IIA-TCL
 
-# MLP ---------------------------------------------------------
-list_hidden_nodes = [4 * num_comp] * (num_layer - 1) + [num_comp]
-list_hidden_nodes_z = None
-# list of the number of nodes of each hidden layer of feature-MLP
-# [layer1, layer2, ..., layer(num_layer)]
-
-
 # Training ----------------------------------------------------
-initial_learning_rate = 0.001  # initial learning rate (default:0.1)
 num_epoch = 350
 dt = 0.001
 lr = 3e-3
-momentum = 0.9  # momentum parameter of SGD
-max_steps = int(15e4)  # number of iterations (mini-batches)
-decay_steps = int(1e6)  # decay steps (tf.train.exponential_decay)
-decay_factor = 0.1  # decay factor (tf.train.exponential_decay)
 batch_size = 512  # mini-batch size
-moving_average_decay = 0.999  # moving average decay of variables to be saved
-checkpoint_steps = int(1e7)  # interval to save checkpoint
-summary_steps = int(1e4)  # interval to save summary
 apply_pca = True  # apply PCA for preprocessing or not
 # todo: turn PCA off
-weight_decay = 1e-5  # weight decay
 
 import numpy as np
 import torch
