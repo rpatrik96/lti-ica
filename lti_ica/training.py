@@ -4,7 +4,7 @@ import lti_ica.models
 
 
 
-def regularized_log_likelihood(data, num_segment, segment_means, segment_variances, num_epoch=1000, lr=1e-3):
+def regularized_log_likelihood(data, num_segment, segment_means, segment_variances, num_epoch=1000, lr=1e-3, triangular=False):
     """
     A function that takes data stratified into segments.
     Assuming each segment is distributed according to a multivariate Gaussian,
