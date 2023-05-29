@@ -2,12 +2,6 @@
     Main script for training the model
 """
 
-import os
-import shutil
-
-from subfunc.preprocessing import pca
-from subfunc.showdata import *
-
 # Parameters ==================================================
 # =============================================================
 
@@ -48,7 +42,8 @@ apply_pca = True  # apply PCA for preprocessing or not
 weight_decay = 1e-5  # weight decay
 
 import torch
-import torch.nn as nn
+import numpy as np
+import lti_ica.models
 
 
 def regularized_log_likelihood(data, num_segment, segment_means, segment_variances, num_epoch=1000, lr=1e-3):
@@ -70,7 +65,7 @@ def regularized_log_likelihood(data, num_segment, segment_means, segment_varianc
     segment_variances = torch.from_numpy(segment_variances.astype(np.float32)).to(device)
     segment_means = torch.from_numpy(segment_means.astype(np.float32)).to(device)
 
-    model = model.LTINet(num_dim=data.shape[-1],
+    model = lti_ica.models.LTINet(num_dim=data.shape[-1],
                          num_class=num_segment, C=False, triangular=triangular)
 
     model = model.to(device)
@@ -107,6 +102,10 @@ def regularized_log_likelihood(data, num_segment, segment_means, segment_varianc
 
 
 def generate_segment_stats():
+
+    rank = 0
+    num_attempt = 0
+
     while rank < num_comp:
         segment_variances = np.abs(np.random.randn(num_segment, num_comp)) / 2
 
@@ -132,7 +131,6 @@ def generate_segment_stats():
 
 
 def generate_nonstationary_data(segment_means, segment_variances):
-
     # iterate over the segment variances,
     # generate multivariate normal with each variance,
     # and simulate it with the LTI system
@@ -160,7 +158,6 @@ def generate_nonstationary_data(segment_means, segment_variances):
 
 
 if __name__ == '__main__':
-
     # Generate sensor signal --------------------------------------
     np.random.seed(random_seed)
     torch.manual_seed(random_seed)
@@ -169,12 +166,10 @@ if __name__ == '__main__':
     num_segmentdata = int(np.ceil(num_data / num_segment))
     y = np.tile(np.arange(num_segment), [num_segmentdata, 1]).T.reshape(-1)[:num_data]
 
-    from state_space_models.lti import LTISystem
+    from state_space_models.state_space_models.lti import LTISystem
 
     lti = LTISystem.controllable_system(num_comp, num_comp, dt=dt, triangular=triangular)
 
-    rank = 0
-    num_attempt = 0
 
     segment_means, segment_variances = generate_segment_stats()
 
