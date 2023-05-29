@@ -35,14 +35,11 @@ def generate_nonstationary_data(lti, segment_means, segment_variances, num_comp,
     # and simulate it with the LTI system
     obs = []
     states = []
-    for i in enumerate(segment_variances):
-        segment_var = segment_variances[i, :]
-        segment_cov = np.diag(segment_var)
-
+    for i, segment_var in enumerate(segment_variances):
         # todo: change the means to be non-zero
         segment_mean = np.zeros(num_comp)
 
-        segment_U = np.random.multivariate_normal(segment_mean, segment_cov, num_segmentdata)
+        segment_U = np.random.multivariate_normal(segment_mean, np.diag(segment_var), num_segmentdata)
 
         _, segment_obs, segment_state = lti.simulate(segment_U, dt=dt)
 

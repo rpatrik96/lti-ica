@@ -29,7 +29,6 @@ class LTINet(nn.Module):
             except:
                 pass
 
-        torch.nn.init.orthogonal_(self.mlr.weight)
 
         # rescale A such that all eigenvalues are < 1
         self.A.weight.data = self.A.weight.data / torch.max(torch.abs(torch.linalg.eig(self.A.weight.data)[0])) * 0.9

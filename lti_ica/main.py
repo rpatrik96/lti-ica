@@ -67,11 +67,11 @@ if __name__ == '__main__':
     model = regularized_log_likelihood(x.T, num_segment, segment_means, segment_variances, num_epoch=num_epoch, lr=lr)
 
     # calculate MCC
-    _, estimated_factors, _ = model(torch.from_numpy(x.T.astype(np.float32).reshape([-1, ar_order + 1, x.T.shape[1]])))
+    estimated_factors = model(torch.from_numpy(x.T.astype(np.float32).reshape([-1, ar_order + 1, x.T.shape[1]])))
     import mcc
 
     mat, _, _ = mcc.correlation(
-        s[:, 0::2],  # since we use xt, xtplusone, we oonly have half the preds
+        s[:, 0::2],  # since we use xt, xtplusone, we only have half the preds
         estimated_factors.detach().numpy().T,
         method="Pearson",
     )

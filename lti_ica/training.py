@@ -1,10 +1,11 @@
-import torch
 import numpy as np
+import torch
+
 import lti_ica.models
 
 
-
-def regularized_log_likelihood(data, num_segment, segment_means, segment_variances, num_epoch=1000, lr=1e-3, triangular=False):
+def regularized_log_likelihood(data, num_segment, segment_means, segment_variances, num_epoch=1000, lr=1e-3,
+                               triangular=False):
     """
     A function that takes data stratified into segments.
     Assuming each segment is distributed according to a multivariate Gaussian,
@@ -24,7 +25,7 @@ def regularized_log_likelihood(data, num_segment, segment_means, segment_varianc
     segment_means = torch.from_numpy(segment_means.astype(np.float32)).to(device)
 
     model = lti_ica.models.LTINet(num_dim=data.shape[-1],
-                         num_class=num_segment, C=False, triangular=triangular)
+                                  num_class=num_segment, C=False, triangular=triangular)
 
     model = model.to(device)
     model.train()
@@ -43,7 +44,7 @@ def regularized_log_likelihood(data, num_segment, segment_means, segment_varianc
         for segment, segment_mean, segment_var in zip(segments, segment_means, segment_variances):
             segment_var = segment_var.diag()
 
-            _, latent, _ = model(segment)
+            latent = model(segment)
 
             log_likelihood = torch.distributions.MultivariateNormal(segment_mean, segment_var).log_prob(latent).mean()
 
@@ -57,4 +58,3 @@ def regularized_log_likelihood(data, num_segment, segment_means, segment_varianc
             print(f"epoch: {epoch}, log_likelihood: {log_likelihood}")
 
     return model
-
