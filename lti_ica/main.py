@@ -10,9 +10,10 @@ num_comp = 3  # number of components (dimension)
 ar_order = 1
 random_seed = 42  # random seed
 triangular = False
-num_segment = 8  # learn by IIA-TCL
-data_per_segment = 2**11
-num_data = num_segment * (data_per_segment*2)
+num_segment = 4  # learn by IIA-TCL
+data_per_segment = 2 ** 11
+num_data = num_segment * (data_per_segment * 2)
+zero_means = False
 
 use_B = True
 
@@ -38,7 +39,7 @@ import lti_ica.models
 
 def data_gen(num_comp, dt, triangular, use_B):
     lti = LTISystem.controllable_system(num_comp, num_comp, dt=dt, triangular=triangular, use_B=use_B)
-    segment_means, segment_variances = generate_segment_stats(num_comp, num_segment)
+    segment_means, segment_variances = generate_segment_stats(num_comp, num_segment, zero_means=zero_means)
 
     # Remake label for TCL learning
     num_segmentdata = int(np.ceil(num_data / num_segment))

@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def generate_segment_stats(num_comp, num_segment):
+def generate_segment_stats(num_comp, num_segment, zero_means=False):
     rank = 0
     num_attempt = 0
 
@@ -9,8 +9,7 @@ def generate_segment_stats(num_comp, num_segment):
         segment_variances = np.abs(np.random.randn(num_segment, num_comp)) / 2
 
         print(f"{segment_variances=}")
-        # segment_means = np.random.randn(num_segment, num_comp)
-        segment_means = np.zeros((num_segment, num_comp))
+        segment_means = np.random.randn(num_segment, num_comp) if zero_means is True else np.zeros((num_segment, num_comp))
 
         # check sufficient variability of the variances
         base_prec = 1. / segment_variances[0, :]
