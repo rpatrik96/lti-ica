@@ -13,7 +13,7 @@ triangular = False
 num_segment = 4  # learn by IIA-TCL
 data_per_segment = 2 ** 11
 num_data = num_segment * (data_per_segment * 2)
-zero_means = False
+zero_means = True
 
 use_B = True
 
