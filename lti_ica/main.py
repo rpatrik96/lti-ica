@@ -119,42 +119,24 @@ if __name__ == '__main__':
                 print(f"epoch: {i}, loss: {loss}")
 
     # evaluate
+    eval = False
     # generate new data and calculate MSE between predicted and true output
     # segment_means, segment_variances, x, s = data_gen(num_comp, dt, triangular, use_B)
 
 
-    # extract the A,B,C matrices from teh model
-    if isinstance(model, lti_ica.models.LTINet):
-        A_est = model.A.detach().numpy()
-        B_est = model.B_inv.inverse().detach().numpy()
-        C_est = model.C_inv.inverse().detach().numpy()
-    elif isinstance(model, lti_ica.models.LTINetMLP):
-        A_est = A.detach().numpy()
-        B_est = B_inv.inverse().detach().numpy()
-        C_est = C_inv.inverse().detach().numpy()
+    if eval is True:
+        # extract the A,B,C matrices from teh model
+        if isinstance(model, lti_ica.models.LTINet):
+            A_est = model.A.detach().numpy()
+            B_est = model.B_inv.inverse().detach().numpy()
+            C_est = model.C_inv.inverse().detach().numpy()
+        elif isinstance(model, lti_ica.models.LTINetMLP):
+            A_est = A.detach().numpy()
+            B_est = B_inv.inverse().detach().numpy()
+            C_est = C_inv.inverse().detach().numpy()
 
-
-    # # Calculate transfer function for true system
-    # h_lti = lti.C @ np.linalg.inv(np.eye(num_comp) - lti.A) @ lti.B
-    #
-    # # Calculate transfer function for estimated system
-    # h_est = C_est @ np.linalg.inv(np.eye(num_comp) - A_est) @ B_est
-    #
-    # # check whether the transfer functions are similar
-    # # qr decomposition and print Q, R
-    # q1, r1 = np.linalg.qr(h_lti@np.linalg.inv(h_est))
-    # q2, r2 = np.linalg.qr(np.linalg.inv(h_est)@h_lti)
-    #
-    # print(f"Q1: {q1}")
-    # print(f"R1: {r1}")
-    # print(f"Q2: {q2}")
-    # print(f"R2: {r2}")
-
-
-
-
-    # create a scipy LTI object from the matrices
-    lti_est = LTISystem(A_est, B_est, C_est, dt=dt)
+        # create a scipy LTI object from the matrices
+        lti_est = LTISystem(A_est, B_est, C_est, dt=dt)
 
     # generate new data from a multivariate normal
     cov = np.diag(np.random.uniform(0.1, 1, size=num_comp))
