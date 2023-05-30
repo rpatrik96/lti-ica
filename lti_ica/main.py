@@ -8,7 +8,7 @@
 # Data generation ---------------------------------------------
 num_comp = 10  # number of components (dimension)
 ar_order = 1
-random_seed = 42  # random seed
+random_seed = 568  # random seed
 triangular = False
 num_segment = 11
 data_per_segment = 2 ** 11
@@ -17,6 +17,7 @@ zero_means = True
 
 use_B = True
 use_C = True
+max_variability = True
 
 # Training ----------------------------------------------------
 num_epoch = 10000
@@ -26,7 +27,7 @@ model = "mlp"
 dt = 0.003
 lr = 3e-3
 max_norm = 0.25
-num_experiment = 3
+num_experiment = 1
 save = True
 
 import numpy as np
@@ -42,7 +43,7 @@ from state_space_models.state_space_models.lti import LTISystem
 
 def data_gen(num_comp, dt, triangular, use_B, use_C=False):
     lti = LTISystem.controllable_system(num_comp, num_comp, dt=dt, triangular=triangular, use_B=use_B, use_C=use_C)
-    segment_means, segment_variances = generate_segment_stats(num_comp, num_segment, zero_means=zero_means)
+    segment_means, segment_variances = generate_segment_stats(num_comp, num_segment, zero_means=zero_means,  max_variability=max_variability)
 
     # Remake label for TCL learning
     num_segmentdata = int(np.ceil(num_data / num_segment))
@@ -80,7 +81,7 @@ if __name__ == '__main__':
 
         print(f"mcc: {mccs[-1]}")
 
-    filename = f"seed_{random_seed}_segment_{num_segment}_comp_{num_comp}_triangular_{triangular}_use_B_{use_B}_use_C_{use_C}.csv"
+    filename = f"seed_{random_seed}_segment_{num_segment}_comp_{num_comp}_triangular_{triangular}_use_B_{use_B}_use_C_{use_C}_max_variability_{max_variability}.csv"
 
     # convert mccs list to numpy and calculate mean and std
     mccs = np.array(mccs)
