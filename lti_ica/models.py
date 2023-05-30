@@ -65,7 +65,7 @@ class LTINetMLP(nn.Module):
         super().__init__()
 
         self.num_dim = num_dim
-        self.net = nn.Linear(2 * num_dim, num_dim, bias=True)
+        self.net = nn.Linear(2 * num_dim, num_dim, bias=False)
 
         torch.nn.init.orthogonal_(self.net.weight)
 
