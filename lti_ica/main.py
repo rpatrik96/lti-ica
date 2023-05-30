@@ -20,6 +20,7 @@ use_B = True
 # Training ----------------------------------------------------
 num_epoch = 4000
 num_epoch_mse = 1000
+model = "mlp"
 
 dt = 0.01
 lr = 3e-3
@@ -32,10 +33,11 @@ import pandas as pd
 import torch
 
 import lti_ica.mcc
+import lti_ica.models
 from lti_ica.data import generate_nonstationary_data, generate_segment_stats
 from lti_ica.training import regularized_log_likelihood
 from state_space_models.state_space_models.lti import LTISystem
-import lti_ica.models
+
 
 def data_gen(num_comp, dt, triangular, use_B):
     lti = LTISystem.controllable_system(num_comp, num_comp, dt=dt, triangular=triangular, use_B=use_B)
@@ -72,7 +74,7 @@ if __name__ == '__main__':
     # run experiments
     for i in range(num_experiment):
         model = regularized_log_likelihood(x.T, num_segment, segment_means, segment_variances, num_epoch=num_epoch,
-                                           lr=lr)
+                                           lr=lr, model=model)
         mccs.append(calc_mcc(model, x, s, ar_order))
 
     filename = f"seed_{random_seed}_segment_{num_segment}_comp_{num_comp}_triangular_{triangular}.csv"
