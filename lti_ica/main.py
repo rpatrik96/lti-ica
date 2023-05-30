@@ -6,27 +6,28 @@
 # =============================================================
 
 # Data generation ---------------------------------------------
-num_comp = 3  # number of components (dimension)
+num_comp = 10  # number of components (dimension)
 ar_order = 1
 random_seed = 42  # random seed
 triangular = False
-num_segment = 4  # learn by IIA-TCL
+num_segment = 11
 data_per_segment = 2 ** 11
 num_data = num_segment * (data_per_segment * 2)
 zero_means = True
 
 use_B = True
+use_C = True
 
 # Training ----------------------------------------------------
-num_epoch = 4000
+num_epoch = 10000
 num_epoch_mse = 1000
 model = "mlp"
 
-dt = 0.01
+dt = 0.003
 lr = 3e-3
 max_norm = 0.25
-num_experiment = 1
-save = False
+num_experiment = 3
+save = True
 
 import numpy as np
 import pandas as pd
@@ -39,8 +40,8 @@ from lti_ica.training import regularized_log_likelihood
 from state_space_models.state_space_models.lti import LTISystem
 
 
-def data_gen(num_comp, dt, triangular, use_B):
-    lti = LTISystem.controllable_system(num_comp, num_comp, dt=dt, triangular=triangular, use_B=use_B)
+def data_gen(num_comp, dt, triangular, use_B, use_C=False):
+    lti = LTISystem.controllable_system(num_comp, num_comp, dt=dt, triangular=triangular, use_B=use_B, use_C=use_C)
     segment_means, segment_variances = generate_segment_stats(num_comp, num_segment, zero_means=zero_means)
 
     # Remake label for TCL learning
@@ -79,7 +80,7 @@ if __name__ == '__main__':
 
         print(f"mcc: {mccs[-1]}")
 
-    filename = f"seed_{random_seed}_segment_{num_segment}_comp_{num_comp}_triangular_{triangular}.csv"
+    filename = f"seed_{random_seed}_segment_{num_segment}_comp_{num_comp}_triangular_{triangular}_use_B_{use_B}_use_C_{use_C}.csv"
 
     # convert mccs list to numpy and calculate mean and std
     mccs = np.array(mccs)
@@ -100,7 +101,6 @@ if __name__ == '__main__':
         C_inv = torch.eye(num_comp, dtype=torch.float32)
         eye = torch.eye(num_comp, dtype=torch.float32)
 
-
         optimizer = torch.optim.Adam([A, B_inv], lr=3e-3)
         target = model.net.weight.data.detach()
 
@@ -110,9 +110,9 @@ if __name__ == '__main__':
             optimizer.zero_grad()
             # calculate loss
 
-            est = B_inv@torch.cat((eye, eye), dim=1)@torch.block_diag(C_inv, -A@C_inv)
+            est = B_inv @ torch.cat((eye, eye), dim=1) @ torch.block_diag(C_inv, -A @ C_inv)
 
-            loss = torch.mean((target - est)**2)
+            loss = torch.mean((target - est) ** 2)
             # backprop
             loss.backward()
             optimizer.step()
@@ -140,30 +140,26 @@ if __name__ == '__main__':
         # create a scipy LTI object from the matrices
         lti_est = LTISystem(A_est, B_est, C_est, dt=dt)
 
-    # generate new data from a multivariate normal
-    cov = np.diag(np.random.uniform(0.1, 1, size=num_comp))
-    u = np.random.multivariate_normal(np.zeros(num_comp), cov, size=data_per_segment)
+        # generate new data from a multivariate normal
+        cov = np.diag(np.random.uniform(0.1, 1, size=num_comp))
+        u = np.random.multivariate_normal(np.zeros(num_comp), cov, size=data_per_segment)
 
+        # simulate x from s with lti
+        t, out, state = lti.simulate(u)
+        t, out_est, state_est = lti_est.simulate(u)
 
-    # simulate x from s with lti
-    t, out, state = lti.simulate(u)
-    t, out_est, state_est = lti_est.simulate(u)
-
-    # MSE between x and out_est
-    mse = np.mean((out - out_est)**2)
-    print("------------------------------------")
-    print(f"MSE: {mse}")
-    print("------------------------------------")
-
-
-
-
+        # MSE between x and out_est
+        mse = np.mean((out - out_est) ** 2)
+        print("------------------------------------")
+        print(f"MSE: {mse}")
+        print("------------------------------------")
 
     if save is True:
         # Define your data as a dictionary or a list of dictionaries
-        data = [{'mcc_mean': mcc_mean, "mcc_std": mcc_std, 'random_seed': random_seed, 'dt': dt, 'num_segment': num_segment,
-                 'num_comp': num_comp, 'num_data': num_data, 'num_epoch': num_epoch, 'lr': lr,
-                 'triangular': triangular}]
+        data = [
+            {'mcc_mean': mcc_mean, "mcc_std": mcc_std, 'random_seed': random_seed, 'dt': dt, 'num_segment': num_segment,
+             'num_comp': num_comp, 'num_data': num_data, 'num_epoch': num_epoch, 'lr': lr, "use_B": use_B, "use_C": use_C,
+             'triangular': triangular}]
 
         # Create a DataFrame from the data
         df = pd.DataFrame(data)
