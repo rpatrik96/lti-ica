@@ -77,6 +77,8 @@ if __name__ == '__main__':
                                            lr=lr, model=model)
         mccs.append(calc_mcc(model, x, s, ar_order))
 
+        print(f"mcc: {mccs[-1]}")
+
     filename = f"seed_{random_seed}_segment_{num_segment}_comp_{num_comp}_triangular_{triangular}.csv"
 
     # convert mccs list to numpy and calculate mean and std
