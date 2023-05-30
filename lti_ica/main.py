@@ -88,9 +88,7 @@ if __name__ == '__main__':
     print(f"mcc_mean: {mcc_mean}, mcc_std: {mcc_std}")
     print("------------------------------------")
 
-
-
-    if isinstance(model, lti_ica.models.LTINetMLP):
+    if False and isinstance(model, lti_ica.models.LTINetMLP):
 
         # parametrize A, B_inv, C_inv and learn them to match model.net.weight.data in the MSE sense
 
@@ -103,6 +101,8 @@ if __name__ == '__main__':
 
         optimizer = torch.optim.Adam([A, B_inv], lr=3e-3)
         target = model.net.weight.data.detach()
+
+        # todo: the problem is that the estimate can be unstable (eigval>1)
 
         for i in range(num_epoch_mse):
             optimizer.zero_grad()
