@@ -1,11 +1,11 @@
-from torch import nn
 import torch
+from torch import nn
 
 
 # =============================================================
 # =============================================================
 class LTINet(nn.Module):
-    def __init__(self,  num_dim, num_class, C=True, triangular=False):
+    def __init__(self, num_dim, num_class, B=True, C=True, triangular=False):
         """ Network model for segment-wise stationary model for LTI systems
          Args:
              num_dim: number of dimension
@@ -14,11 +14,10 @@ class LTINet(nn.Module):
         super().__init__()
 
         self.B_inv = nn.Linear(num_dim, num_dim, bias=False)
-        self.A = nn.Linear(num_dim, num_dim, bias=False)
+        self.A = nn.Linear(num_dim, num_dim, bias=False) if B is True else torch.eye(num_dim)
         self.C_inv = nn.Linear(num_dim, num_dim, bias=False) if C is True else torch.eye(num_dim)
         self.I = torch.eye(num_dim)
         self.triangular = triangular
-
 
         self.num_dim = num_dim
 
@@ -29,11 +28,8 @@ class LTINet(nn.Module):
             except:
                 pass
 
-
         # rescale A such that all eigenvalues are < 1
         self.A.weight.data = self.A.weight.data / torch.max(torch.abs(torch.linalg.eig(self.A.weight.data)[0])) * 0.9
-        self.B_inv.weight.data = torch.eye(num_dim)
-        self.B_inv.requires_grad = False
 
     def forward(self, x):
         """ forward
@@ -41,18 +37,43 @@ class LTINet(nn.Module):
              x: input [batch, time(t:t-p), dim]
          """
 
-
         if self.C_inv is nn.Linear:
-            cinvx = self.C_inv(x)
+            cinvxt = self.C_inv(x[:, 0, :])
+            cinvxtplusone = self.C_inv(x[:, 1, :])
         else:
-            cinvx = x
+            cinvxt = x[:, 0, :]
+            cinvxtplusone = x[:, 1, :]
 
-        cinvxt = cinvx[:, 0, :]
-        cinvxtplusone = cinvx[:, 1, :]
         if self.triangular:
-            hout = self.B_inv(cinvxtplusone - cinvxt@self.A.weight.tril())
+            hout = cinvxtplusone - cinvxt @ self.A.weight.tril()
         else:
-            hout = self.B_inv(cinvxtplusone - self.A(cinvxt))
+            hout = cinvxtplusone - self.A(cinvxt)
 
+        if self.B_inv is nn.Linear:
+            hout = self.B_inv(hout)
 
         return hout
+
+
+class LTINetMLP(nn.Module):
+    def __init__(self, num_dim):
+        """ Network model for segment-wise stationary model for LTI systems
+         Args:
+             num_dim: number of dimension
+             num_class: number of classes
+         """
+        super().__init__()
+
+        self.num_dim = num_dim
+        self.net = nn.Linear(2 * num_dim, num_dim, bias=True)
+
+        torch.nn.init.orthogonal_(self.net.weight)
+
+
+    def forward(self, x):
+        """ forward
+         Args:
+             x: input [batch, time(t:t-p), dim]
+         """
+
+        return self.net(x.reshape(-1, 2 * self.num_dim))
