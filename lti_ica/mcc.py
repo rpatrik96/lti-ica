@@ -48,17 +48,6 @@ class Munkres:
         self.marked = None
         self.path = None
 
-    def make_cost_matrix(profit_matrix, inversion_function):
-        """
-        **DEPRECATED**
-        Please use the module function ``make_cost_matrix()``.
-        """
-        from . import munkres
-
-        return munkres.make_cost_matrix(profit_matrix, inversion_function)
-
-    make_cost_matrix = staticmethod(make_cost_matrix)
-
     def pad_matrix(self, matrix, pad_value=0):
         """
         Pad a possibly non-square matrix to make it square.
