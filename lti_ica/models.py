@@ -13,8 +13,8 @@ class LTINet(nn.Module):
         """
         super().__init__()
 
-        self.B_inv = nn.Linear(num_dim, num_dim, bias=False)
-        self.A = (
+        self.A = nn.Linear(num_dim, num_dim, bias=False)
+        self.B_inv = (
             nn.Linear(num_dim, num_dim, bias=False) if B is True else torch.eye(num_dim)
         )
         self.C_inv = (
