@@ -1,6 +1,6 @@
 import numpy as np
 
-from lti_ica.main import num_segment, zero_means, max_variability, num_data
+
 from state_space_models.state_space_models.lti import LTISystem
 
 
