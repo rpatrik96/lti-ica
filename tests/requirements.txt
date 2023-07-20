@@ -6,3 +6,4 @@ pytest-flake8
 black~=23.7.0
 flake8
 check-manifest
+mypy~=1.4.1
