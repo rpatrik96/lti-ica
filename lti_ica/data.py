@@ -22,7 +22,7 @@ def generate_segment_stats(num_comp, num_segment, zero_means=False,  max_variabi
 
 
         print(f"{segment_variances=}")
-        segment_means = np.random.randn(num_segment, num_comp) if zero_means is True else np.zeros((num_segment, num_comp))
+        segment_means = np.random.randn(num_segment, num_comp) if zero_means is False else np.zeros((num_segment, num_comp))
 
         # check sufficient variability of the variances
         base_prec = 1. / segment_variances[0, :]
