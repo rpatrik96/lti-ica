@@ -12,7 +12,7 @@ ar_order = 1
 random_seed = 568  # random seed
 triangular = False
 num_segment = 11
-data_per_segment = 2 ** 11
+data_per_segment = 2**11
 num_data = num_segment * (data_per_segment * 2)
 zero_means = True
 
@@ -40,20 +40,35 @@ from lti_ica.data import data_gen
 from lti_ica.training import regularized_log_likelihood
 from state_space_models.state_space_models.lti import LTISystem
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # Generate sensor signal --------------------------------------
     np.random.seed(random_seed)
     torch.manual_seed(random_seed)
 
-    segment_means, segment_variances, x, s, lti = data_gen(num_comp, num_data, num_segment, dt, triangular, use_B,
-                                                           zero_means, max_variability)
+    segment_means, segment_variances, x, s, lti = data_gen(
+        num_comp,
+        num_data,
+        num_segment,
+        dt,
+        triangular,
+        use_B,
+        zero_means,
+        max_variability,
+    )
 
     mccs = []
 
     # run experiments
     for i in range(num_experiment):
-        model = regularized_log_likelihood(x.T, num_segment, segment_means, segment_variances, num_epoch=num_epoch,
-                                           lr=lr, model=model)
+        model = regularized_log_likelihood(
+            x.T,
+            num_segment,
+            segment_means,
+            segment_variances,
+            num_epoch=num_epoch,
+            lr=lr,
+            model=model,
+        )
         mccs.append(calc_mcc(model, x, s, ar_order))
 
         print(f"mcc: {mccs[-1]}")
@@ -70,7 +85,6 @@ if __name__ == '__main__':
     print("------------------------------------")
 
     if False and isinstance(model, lti_ica.models.LTINetMLP):
-
         # parametrize A, B_inv, C_inv and learn them to match model.net.weight.data in the MSE sense
 
         A = torch.nn.Parameter(torch.randn(num_comp, num_comp))
@@ -88,7 +102,11 @@ if __name__ == '__main__':
             optimizer.zero_grad()
             # calculate loss
 
-            est = B_inv @ torch.cat((eye, eye), dim=1) @ torch.block_diag(C_inv, -A @ C_inv)
+            est = (
+                B_inv
+                @ torch.cat((eye, eye), dim=1)
+                @ torch.block_diag(C_inv, -A @ C_inv)
+            )
 
             loss = torch.mean((target - est) ** 2)
             # backprop
@@ -102,7 +120,6 @@ if __name__ == '__main__':
     eval = False
     # generate new data and calculate MSE between predicted and true output
     # segment_means, segment_variances, x, s = data_gen(num_comp, dt, triangular, use_B)
-
 
     if eval is True:
         # extract the A,B,C matrices from teh model
@@ -120,7 +137,9 @@ if __name__ == '__main__':
 
         # generate new data from a multivariate normal
         cov = np.diag(np.random.uniform(0.1, 1, size=num_comp))
-        u = np.random.multivariate_normal(np.zeros(num_comp), cov, size=data_per_segment)
+        u = np.random.multivariate_normal(
+            np.zeros(num_comp), cov, size=data_per_segment
+        )
 
         # simulate x from s with lti
         t, out, state = lti.simulate(u)
@@ -135,12 +154,24 @@ if __name__ == '__main__':
     if save is True:
         # Define your data as a dictionary or a list of dictionaries
         data = [
-            {'mcc_mean': mcc_mean, "mcc_std": mcc_std, 'random_seed': random_seed, 'dt': dt, 'num_segment': num_segment,
-             'num_comp': num_comp, 'num_data': num_data, 'num_epoch': num_epoch, 'lr': lr, "use_B": use_B, "use_C": use_C,
-             'triangular': triangular}]
+            {
+                "mcc_mean": mcc_mean,
+                "mcc_std": mcc_std,
+                "random_seed": random_seed,
+                "dt": dt,
+                "num_segment": num_segment,
+                "num_comp": num_comp,
+                "num_data": num_data,
+                "num_epoch": num_epoch,
+                "lr": lr,
+                "use_B": use_B,
+                "use_C": use_C,
+                "triangular": triangular,
+            }
+        ]
 
         # Create a DataFrame from the data
         df = pd.DataFrame(data)
 
         # Save the DataFrame to a CSV file with column names
-        df.to_csv(filename, index=False, header=True, mode='a')
+        df.to_csv(filename, index=False, header=True, mode="a")

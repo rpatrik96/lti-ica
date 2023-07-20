@@ -521,7 +521,11 @@ def correlation(x, y, method="Pearson"):
 
 
 def calc_mcc(model, x, s, ar_order=1):
-    estimated_factors = model(torch.from_numpy(x.T.astype(np.float32).reshape([-1, ar_order + 1, x.T.shape[1]])))
+    estimated_factors = model(
+        torch.from_numpy(
+            x.T.astype(np.float32).reshape([-1, ar_order + 1, x.T.shape[1]])
+        )
+    )
     mat, _, _ = correlation(
         s[:, 0::2],  # since we use xt, xtplusone, we only have half the preds
         estimated_factors.detach().numpy().T,

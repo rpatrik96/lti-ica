@@ -1,4 +1,3 @@
-
 import pytest
 from lti_ica.models import LTINet, LTINetMLP
 import torch
@@ -8,25 +7,30 @@ import torch
 def num_comp():
     return 3
 
+
 @pytest.fixture
 def num_segment():
     return 4
+
 
 @pytest.fixture
 def num_segmentdata():
     return 3000
 
+
 @pytest.fixture
 def dt():
     return 0.01
+
 
 @pytest.fixture
 def ar_order():
     return 1
 
+
 @pytest.fixture
 def device():
-    return torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    return torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
 # @pytest.fixture(use_B=[True, False]])
