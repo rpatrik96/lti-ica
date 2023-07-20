@@ -25,10 +25,7 @@ def test_calc_mcc(model):
     ar_order = 1
 
     data = x.T.reshape([-1, ar_order + 1, x.T.shape[1]])
-
     data = torch.from_numpy(data.astype(np.float32)).to(device)
-    segment_variances = torch.from_numpy(segment_variances.astype(np.float32)).to(device)
-    segment_means = torch.from_numpy(segment_means.astype(np.float32)).to(device)
 
     if model == "lti":
         model = lti_ica.models.LTINet(num_dim=data.shape[-1],
