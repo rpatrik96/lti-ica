@@ -76,7 +76,7 @@ if __name__ == "__main__":
     filename = f"seed_{random_seed}_segment_{num_segment}_comp_{num_comp}_triangular_{triangular}_use_B_{use_B}_use_C_{use_C}_max_variability_{max_variability}.csv"
 
     # convert mccs list to numpy and calculate mean and std
-    mccs = np.array(mccs)
+    mccs: np.ndarray = np.array(mccs)  # type: ignore
     mcc_mean = np.mean(mccs)
     mcc_std = np.std(mccs)
 
