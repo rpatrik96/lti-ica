@@ -47,6 +47,9 @@ jobs:
 
     - name: Install dependencies
       run: |
+        pip install --requirement state_space_models/requirements.txt --upgrade --quiet
+        pip install --requirement state_space_models/tests/requirements.txt --quiet
+        
         pip install --requirement requirements.txt --upgrade --quiet
         pip install --requirement tests/requirements.txt --quiet
         
