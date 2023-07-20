@@ -87,10 +87,10 @@ if __name__ == "__main__":
     if False and isinstance(model, lti_ica.models.LTINetMLP):
         # parametrize A, B_inv, C_inv and learn them to match model.net.weight.data in the MSE sense
 
-        A = torch.nn.Parameter(torch.randn(num_comp, num_comp))
-        B_inv = torch.nn.Parameter(torch.randn(num_comp, num_comp))
+        A: torch.nn.Parameter = torch.nn.Parameter(torch.randn(num_comp, num_comp))
+        B_inv: torch.nn.Parameter = torch.nn.Parameter(torch.randn(num_comp, num_comp))
         # C_inv = torch.nn.Parameter(torch.randn(num_comp, num_comp))
-        C_inv = torch.eye(num_comp, dtype=torch.float32)
+        C_inv: torch.nn.Parameter = torch.eye(num_comp, dtype=torch.float32)
         eye = torch.eye(num_comp, dtype=torch.float32)
 
         optimizer = torch.optim.Adam([A, B_inv], lr=3e-3)
