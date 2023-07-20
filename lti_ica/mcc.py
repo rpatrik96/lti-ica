@@ -48,17 +48,6 @@ class Munkres:
         self.marked = None
         self.path = None
 
-    def make_cost_matrix(profit_matrix, inversion_function):
-        """
-        **DEPRECATED**
-        Please use the module function ``make_cost_matrix()``.
-        """
-        from . import munkres
-
-        return munkres.make_cost_matrix(profit_matrix, inversion_function)
-
-    make_cost_matrix = staticmethod(make_cost_matrix)
-
     def pad_matrix(self, matrix, pad_value=0):
         """
         Pad a possibly non-square matrix to make it square.
@@ -518,3 +507,19 @@ def correlation(x, y, method="Pearson"):
         corr_sort = corr_sort[0:dim, dim:]
 
     return corr_sort, sort_idx, x_sort
+
+
+def calc_mcc(model, x, s, ar_order=1):
+    estimated_factors = model(
+        torch.from_numpy(
+            x.T.astype(np.float32).reshape([-1, ar_order + 1, x.T.shape[1]])
+        )
+    )
+    mat, _, _ = correlation(
+        s[:, 0::2],  # since we use xt, xtplusone, we only have half the preds
+        estimated_factors.detach().numpy().T,
+        method="Pearson",
+    )
+    mcc = np.mean(np.abs(np.diag(mat)))
+
+    return mcc

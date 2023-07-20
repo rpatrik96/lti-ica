@@ -1,0 +1,76 @@
+name: CI testing
+
+# see: https://help.github.com/en/actions/reference/events-that-trigger-workflows
+on:
+  # Trigger the workflow on push or pull request, but only for the main branch
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  pytest:
+
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        python-version: [3.9]
+
+    # Timeout: https://stackoverflow.com/a/59076067/4521646
+    timeout-minutes: 35
+
+
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: true
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Get pip cache dir
+      id: pip-cache
+      run: echo "dir=$(pip cache dir)" >> $GITHUB_OUTPUT
+
+    - name: Cache pip
+      uses: actions/cache@v3
+      with:
+        path: ${{ steps.pip-cache.outputs.dir }}
+        key: ${{ runner.os }}-pip-py${{ matrix.python-version }}-${{ matrix.requires }}-${{ hashFiles('requirements.txt') }}-${{ hashFiles('requirements/modules.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-py${{ matrix.python-version }}-${{ matrix.requires }}-
+
+    - name: Install dependencies
+      run: |
+        pip install --requirement state_space_models/requirements.txt --upgrade --quiet
+        pip install --requirement state_space_models/tests/requirements.txt --quiet
+        
+        pip install --requirement requirements.txt --upgrade --quiet
+        pip install --requirement tests/requirements.txt --quiet
+        
+        python --version
+        pip --version
+        pip list
+      shell: bash
+
+    - name: black
+      run: |
+        black --check --verbose ./lti_ica/
+
+    - name: mypy
+      run: |
+        mypy lti_ica --ignore-missing-imports --scripts-are-modules
+
+    - name: Tests
+      run: |
+        coverage run --source lti_ica -m pytest tests -v --junitxml=junit/test-results-${{ runner.os }}-${{ matrix.python-version }}.xml
+
+    - name: Statistics
+      if: success()
+      run: |
+        coverage report
