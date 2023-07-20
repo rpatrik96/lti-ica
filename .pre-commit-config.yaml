@@ -1,6 +1,6 @@
 repos:
   - repo: https://github.com/psf/black
-    rev: 23.1.0
+    rev: 23.7.0
     hooks:
       - id: black
         entry: black
@@ -10,3 +10,12 @@ repos:
         # pre-commit's default_language_version, see
         # https://pre-commit.com/#top_level-default_language_version
         language_version: python3.9
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.2.0
+    hooks:
+      - id: mypy
+        entry: mypy
+        types_or: [ python, pyi ]
+        language: python
+        language_version: python3.9
+        args: [ "--ignore-missing-imports", "--scripts-are-modules" ]
