@@ -45,7 +45,8 @@ if __name__ == '__main__':
     np.random.seed(random_seed)
     torch.manual_seed(random_seed)
 
-    segment_means, segment_variances, x, s, lti = data_gen(num_comp, dt, triangular, use_B)
+    segment_means, segment_variances, x, s, lti = data_gen(num_comp, num_data, num_segment, dt, triangular, use_B,
+                                                           zero_means, max_variability)
 
     mccs = []
 
