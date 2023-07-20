@@ -1,6 +1,7 @@
 """ Training
     Main script for training the model
 """
+from lti_ica.mcc import calc_mcc
 
 # Parameters ==================================================
 # =============================================================
@@ -34,24 +35,10 @@ import numpy as np
 import pandas as pd
 import torch
 
-import lti_ica.mcc
 import lti_ica.models
 from lti_ica.data import data_gen
 from lti_ica.training import regularized_log_likelihood
 from state_space_models.state_space_models.lti import LTISystem
-
-
-def calc_mcc(model, x, s, ar_order=1):
-    estimated_factors = model(torch.from_numpy(x.T.astype(np.float32).reshape([-1, ar_order + 1, x.T.shape[1]])))
-    mat, _, _ = lti_ica.mcc.correlation(
-        s[:, 0::2],  # since we use xt, xtplusone, we only have half the preds
-        estimated_factors.detach().numpy().T,
-        method="Pearson",
-    )
-    mcc = np.mean(np.abs(np.diag(mat)))
-
-    return mcc
-
 
 if __name__ == '__main__':
     # Generate sensor signal --------------------------------------
