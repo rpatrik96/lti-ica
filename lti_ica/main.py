@@ -36,20 +36,9 @@ import torch
 
 import lti_ica.mcc
 import lti_ica.models
-from lti_ica.data import generate_nonstationary_data, generate_segment_stats
+from lti_ica.data import data_gen
 from lti_ica.training import regularized_log_likelihood
 from state_space_models.state_space_models.lti import LTISystem
-
-
-def data_gen(num_comp, dt, triangular, use_B, use_C=False):
-    lti = LTISystem.controllable_system(num_comp, num_comp, dt=dt, triangular=triangular, use_B=use_B, use_C=use_C)
-    segment_means, segment_variances = generate_segment_stats(num_comp, num_segment, zero_means=zero_means,  max_variability=max_variability)
-
-    # Remake label for TCL learning
-    num_segmentdata = int(np.ceil(num_data / num_segment))
-
-    x, s = generate_nonstationary_data(lti, segment_means, segment_variances, num_comp, num_segmentdata, dt)
-    return segment_means, segment_variances, x, s, lti
 
 
 def calc_mcc(model, x, s, ar_order=1):
