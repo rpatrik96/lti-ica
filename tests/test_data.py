@@ -5,9 +5,7 @@ from state_space_models.state_space_models.lti import LTISystem
 import numpy as np
 
 @pytest.mark.parametrize("zero_means", [True, False])
-def test_generate_segment_stats_zero_means(zero_means):
-    num_comp = 3
-    num_segment = 4
+def test_generate_segment_stats_zero_means(zero_means, num_comp, num_segment):
     segment_means, segment_variances = generate_segment_stats(num_comp, num_segment, zero_means=zero_means,
                                                               max_variability=False)
     assert segment_means.shape == (num_segment, num_comp)
@@ -18,10 +16,8 @@ def test_generate_segment_stats_zero_means(zero_means):
         assert np.all(segment_means == 0)
 
 @pytest.mark.parametrize("max_variability", [True, False])
-def test_generate_segment_stats_max_variability(max_variability):
+def test_generate_segment_stats_max_variability(max_variability,num_comp, num_segment):
 
-    num_comp = 3
-    num_segment = 4
     segment_means, segment_variances = generate_segment_stats(num_comp, num_segment, zero_means=False,
                                                               max_variability=max_variability)
     assert segment_means.shape == (num_segment, num_comp)
@@ -41,11 +37,7 @@ def test_generate_segment_stats_max_variability(max_variability):
         assert np.all(segment_variances_copy == 0.0001)
 
 
-def test_generate_nonstationary_data():
-    num_comp = 3
-    num_segment = 4
-    num_segmentdata = 3000
-    dt = 0.01
+def test_generate_nonstationary_data(num_comp, num_segment, num_segmentdata, dt):
     segment_means, segment_variances = generate_segment_stats(num_comp, num_segment, zero_means=False,
                                                               max_variability=False)
     lti = LTISystem.controllable_system(num_comp,num_comp, dt=dt)
@@ -56,11 +48,9 @@ def test_generate_nonstationary_data():
 
 
 @pytest.mark.parametrize("triangular", [True, False])
-def test_data_gen_default_params(triangular):
-    num_segment = 4
-    num_data = 3000
-    num_comp = 3
-    segment_means, segment_variances, x, s, lti = data_gen(num_comp, num_data, num_segment, dt=0.01, triangular=triangular)
+def test_data_gen_default_params(triangular, num_comp, num_segment, num_segmentdata, dt):
+    num_data = num_segmentdata*num_segment
+    segment_means, segment_variances, x, s, lti = data_gen(num_comp, num_data, num_segment, dt=dt, triangular=triangular)
     assert len(segment_means) == num_segment
     assert len(segment_variances) == num_segment
     assert x.shape == (num_comp, num_data)
@@ -68,12 +58,10 @@ def test_data_gen_default_params(triangular):
     assert isinstance(lti, LTISystem)
 
 @pytest.mark.parametrize("use_B", [True, False])
-def test_data_gen_custom_params_B(use_B):
-    num_segment = 4
-    num_data = 3000
-    num_comp = 3
+def test_data_gen_custom_params_B(use_B, num_comp, num_segment, num_segmentdata, dt):
+    num_data = num_segment* num_segmentdata
     triangular = False
-    segment_means, segment_variances, x, s, lti = data_gen(num_comp, num_data, num_segment, dt=0.01, triangular=triangular, use_B=use_B, zero_means=False,
+    segment_means, segment_variances, x, s, lti = data_gen(num_comp, num_data, num_segment, dt=dt, triangular=triangular, use_B=use_B, zero_means=False,
                                                            max_variability=False, use_C=True)
     assert len(segment_means) == num_segment
     assert len(segment_variances) == num_segment
@@ -82,12 +70,10 @@ def test_data_gen_custom_params_B(use_B):
     assert isinstance(lti, LTISystem)
 
 @pytest.mark.parametrize("use_C", [True, False])
-def test_data_gen_custom_params_C(use_C):
-    num_segment = 4
-    num_data = 3000
-    num_comp = 3
+def test_data_gen_custom_params_C(use_C, num_comp, num_segment, num_segmentdata, dt):
+    num_data = num_segment * num_segmentdata
     triangular = False
-    segment_means, segment_variances, x, s, lti = data_gen(num_comp, num_data, num_segment, dt=0.01, triangular=triangular, use_B=True, zero_means=True,
+    segment_means, segment_variances, x, s, lti = data_gen(num_comp, num_data, num_segment, dt=dt, triangular=triangular, use_B=True, zero_means=True,
                                                            max_variability=False, use_C=use_C)
     assert len(segment_means) == num_segment
     assert len(segment_variances) == num_segment
