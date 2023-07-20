@@ -41,7 +41,7 @@ def generate_segment_stats(num_comp, num_segment, zero_means=False,  max_variabi
     return segment_means, segment_variances
 
 
-def generate_nonstationary_data(lti, segment_means, segment_variances, num_comp, num_segmentdata, dt):
+def generate_nonstationary_data(lti, segment_means, segment_variances, num_segmentdata, dt):
     # iterate over the segment variances,
     # generate multivariate normal with each variance,
     # and simulate it with the LTI system
