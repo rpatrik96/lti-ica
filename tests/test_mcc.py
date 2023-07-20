@@ -7,22 +7,12 @@ import lti_ica.models
 import pytest
 
 @pytest.mark.parametrize("model", ["lti", "mlp"])
-def test_calc_mcc(model):
-    num_comp = 3
-    num_segment = 4
-    num_segmentdata = 3000
-    dt = 0.01
-    ar_order = 1
+def test_calc_mcc(model, num_comp, num_segment, num_segmentdata, dt, ar_order, device):
     segment_means, segment_variances = generate_segment_stats(num_comp, num_segment, zero_means=False,
                                                               max_variability=False)
     lti = LTISystem.controllable_system(num_comp, num_comp, dt=dt)
     x, s = generate_nonstationary_data(lti, segment_means, segment_variances, num_segmentdata, dt)
 
-    # Initialize random weights
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-
-    # make shuffled batch
-    ar_order = 1
 
     data = x.T.reshape([-1, ar_order + 1, x.T.shape[1]])
     data = torch.from_numpy(data.astype(np.float32)).to(device)
