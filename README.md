@@ -6,7 +6,9 @@
 
 [![Conference](http://img.shields.io/badge/CI4TS@UAI-2023.svg)](https://sites.google.com/view/ci4ts2023/accepted-papers?authuser=0)
 
-![CI testing](https://github.com/rpatrik96/lti-ica/workflows/ci%20testing/badge.svg?branch=main&event=push)
+![CI testing](https://github.com/rpatrik96/lti-ica/workflows/CI%20testing/badge.svg?branch=main&event=push)
+
+</div>
  
 ## Description   
 We connect the ICA and dynamical systems perspectives on identifiability by showing that for Gaussian Linear Time-Invariant (LTI) systems, experiment design (i.e., introducing agency via prescribing sufficiently varying control signals/interventions) enables identifiability in an active manner.
