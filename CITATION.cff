@@ -1,0 +1,18 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+- family-names: "Rajendran"
+  given-names: "Goutham"
+- family-names: "Reizinger"
+  given-names: "Patrik"
+  orcid: "https://orcid.org/0000-0001-9861-0293"
+- family-names: "Brendel"
+  given-names: "Wieland"
+  orcid: "https://orcid.org/0000-0003-0982-552X"
+- family-names: "Ravikumar"
+  given-names: "Pradeep Kumar"
+title: "lti-ica"
+version: 1.0.0
+doi:
+date-released: 2023-07-31
+url: "https://github.com/rpatrik96/lti-ica"
