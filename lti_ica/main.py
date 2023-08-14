@@ -7,21 +7,22 @@ from lti_ica.mcc import calc_mcc
 # =============================================================
 
 # Data generation ---------------------------------------------
-num_comp = 10  # number of components (dimension)
+num_comp = 1  # number of components (dimension)
 ar_order = 1
 random_seed = 568  # random seed
 triangular = False
-num_segment = 11
+num_segment = 3
 data_per_segment = 2**11
 num_data = num_segment * (data_per_segment * 2)
 zero_means = True
 
 use_B = True
 use_C = True
-max_variability = True
+max_variability = False
+system_type = "spring_mass_damper"
 
 # Training ----------------------------------------------------
-num_epoch = 10000
+num_epoch = 3000
 num_epoch_mse = 1000
 model = "mlp"
 
@@ -54,6 +55,7 @@ if __name__ == "__main__":
         use_B,
         zero_means,
         max_variability,
+        system_type,
     )
 
     mccs = []
@@ -69,11 +71,11 @@ if __name__ == "__main__":
             lr=lr,
             model=model,
         )
-        mccs.append(calc_mcc(model, x, s, ar_order))
+        mccs.append(calc_mcc(model, x, s, ar_order, diff_dims=(system_type != "lti")))
 
         print(f"mcc: {mccs[-1]}")
 
-    filename = f"seed_{random_seed}_segment_{num_segment}_comp_{num_comp}_triangular_{triangular}_use_B_{use_B}_use_C_{use_C}_max_variability_{max_variability}.csv"
+    filename = f"seed_{random_seed}_segment_{num_segment}_comp_{num_comp}_triangular_{triangular}_use_B_{use_B}_use_C_{use_C}_max_variability_{max_variability}_{system_type}.csv"
 
     # convert mccs list to numpy and calculate mean and std
     mccs: np.ndarray = np.array(mccs)  # type: ignore
