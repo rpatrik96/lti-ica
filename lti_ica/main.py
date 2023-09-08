@@ -7,7 +7,7 @@ from lti_ica.mcc import calc_mcc
 # =============================================================
 
 # Data generation ---------------------------------------------
-num_comp = 1  # number of components (dimension)
+num_comp = 2  # number of components (dimension)
 ar_order = 1
 random_seed = 568  # random seed
 triangular = False
@@ -19,7 +19,7 @@ zero_means = True
 use_B = True
 use_C = True
 max_variability = False
-system_type = "spring_mass_damper"
+system_type = "lti"  # "lti" or "spring_mass_damper"
 
 # Training ----------------------------------------------------
 num_epoch = 3000
@@ -40,13 +40,14 @@ import lti_ica.models
 from lti_ica.data import data_gen
 from lti_ica.training import regularized_log_likelihood
 from state_space_models.state_space_models.lti import LTISystem
+from lti_ica.dataset import NonstationaryLTIDataset
 
 if __name__ == "__main__":
     # Generate sensor signal --------------------------------------
     np.random.seed(random_seed)
     torch.manual_seed(random_seed)
 
-    segment_means, segment_variances, x, s, lti = data_gen(
+    dataset = NonstationaryLTIDataset(
         num_comp,
         num_data,
         num_segment,
@@ -55,7 +56,9 @@ if __name__ == "__main__":
         use_B,
         zero_means,
         max_variability,
+        use_C,
         system_type,
+        ar_order,
     )
 
     mccs = []
@@ -63,15 +66,20 @@ if __name__ == "__main__":
     # run experiments
     for i in range(num_experiment):
         model = regularized_log_likelihood(
-            x.T,
-            num_segment,
-            segment_means,
-            segment_variances,
+            dataset,
             num_epoch=num_epoch,
             lr=lr,
             model=model,
         )
-        mccs.append(calc_mcc(model, x, s, ar_order, diff_dims=(system_type != "lti")))
+        mccs.append(
+            calc_mcc(
+                model,
+                dataset.observations.T,
+                dataset.sources,
+                ar_order,
+                diff_dims=(system_type != "lti"),
+            )
+        )
 
         print(f"mcc: {mccs[-1]}")
 
