@@ -36,10 +36,7 @@ import numpy as np
 import pandas as pd
 import torch
 
-import lti_ica.models
-from lti_ica.data import data_gen
 from lti_ica.training import regularized_log_likelihood
-from state_space_models.state_space_models.lti import LTISystem
 from lti_ica.dataset import NonstationaryLTIDataset
 
 if __name__ == "__main__":
