@@ -94,14 +94,6 @@ class NonstationaryLTIDataset(Dataset):
 
         self.sources = torch.from_numpy(sources.astype(np.float32)).to(self.device)
 
-    @property
-    def labels(self):
-        return self.num_segmentdata
-
-    @labels.setter
-    def labels(self, num_segmentdata):
-        self.num_segmentdata = num_segmentdata
-
     def __len__(self):
         return self.num_segment
 
@@ -111,5 +103,4 @@ class NonstationaryLTIDataset(Dataset):
             self.segment_means[idx],
             self.segment_variances[idx],
             self.sources,
-            self.labels[idx],
         )
