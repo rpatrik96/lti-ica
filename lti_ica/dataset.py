@@ -2,7 +2,7 @@ import torch
 from torch.utils.data import Dataset
 import numpy as np
 
-from lti_ica.data import generate_nonstationary_data, data_gen, generate_segment_stats
+from lti_ica.data import generate_nonstationary_data, generate_segment_stats
 
 
 from state_space_models.state_space_models.lti import LTISystem, SpringMassDamper
@@ -92,7 +92,7 @@ class NonstationaryLTIDataset(Dataset):
             self.device
         )
 
-        self.sources = torch.from_numpy(sources.astype(np.float32)).to(self.device)
+        self.sources = torch.from_numpy(sources.T.astype(np.float32)).to(self.device)
 
     def __len__(self):
         return self.num_segment
@@ -102,5 +102,4 @@ class NonstationaryLTIDataset(Dataset):
             self.observations[idx],
             self.segment_means[idx],
             self.segment_variances[idx],
-            self.sources,
         )
