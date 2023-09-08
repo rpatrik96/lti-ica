@@ -5,10 +5,7 @@ import lti_ica.models
 
 
 def regularized_log_likelihood(
-    data,
-    num_segment,
-    segment_means,
-    segment_variances,
+    dataset,
     num_epoch=1000,
     lr=1e-3,
     triangular=False,
@@ -25,34 +22,19 @@ def regularized_log_likelihood(
     # Initialize random weights
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    # make shuffled batch
-    ar_order = 1
-
-    data = data.reshape([-1, ar_order + 1, data.shape[1]])
-
-    data = torch.from_numpy(data.astype(np.float32)).to(device)
-    segment_variances = torch.from_numpy(segment_variances.astype(np.float32)).to(
-        device
-    )
-    segment_means = torch.from_numpy(segment_means.astype(np.float32)).to(device)
-
     if model == "lti":
         model = lti_ica.models.LTINet(
-            num_dim=data.shape[-1],
-            num_class=num_segment,
+            num_dim=dataset.observations.shape[-1],
+            num_class=dataset.num_segment,
             C=False,
             triangular=triangular,
             B=use_B,
         )
     elif model == "mlp":
-        model = lti_ica.models.LTINetMLP(num_dim=data.shape[-1])
+        model = lti_ica.models.LTINetMLP(num_dim=dataset.observations.shape[-1])
 
     model = model.to(device)
     model.train()
-
-    # split data into segments
-    segments = torch.split(data, num_segment * [data.shape[0] // num_segment], dim=0)
-    segments = [s for s in segments if s.shape[0] > 0]
 
     optimizer = torch.optim.SGD(model.parameters(), lr=lr)
 
@@ -62,9 +44,12 @@ def regularized_log_likelihood(
         # learn the latents from the segments
         latents = []
         log_likelihood = 0
-        for segment, segment_mean, segment_var in zip(
-            segments, segment_means, segment_variances
-        ):
+
+        for (
+            segment,
+            segment_mean,
+            segment_var,
+        ) in dataset:
             segment_var = segment_var.diag()
 
             latent = model(segment)
