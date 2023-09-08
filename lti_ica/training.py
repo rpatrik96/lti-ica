@@ -49,7 +49,6 @@ def regularized_log_likelihood(
             segment,
             segment_mean,
             segment_var,
-            _,
         ) in dataset:
             segment_var = segment_var.diag()
 
