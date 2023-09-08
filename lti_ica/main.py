@@ -7,21 +7,22 @@ from lti_ica.mcc import calc_mcc
 # =============================================================
 
 # Data generation ---------------------------------------------
-num_comp = 10  # number of components (dimension)
+num_comp = 1  # number of components (dimension)
 ar_order = 1
 random_seed = 568  # random seed
 triangular = False
-num_segment = 11
+num_segment = 3
 data_per_segment = 2**11
 num_data = num_segment * (data_per_segment * 2)
 zero_means = True
 
 use_B = True
 use_C = True
-max_variability = True
+max_variability = False
+system_type = "spring_mass_damper"
 
 # Training ----------------------------------------------------
-num_epoch = 10000
+num_epoch = 3000
 num_epoch_mse = 1000
 model = "mlp"
 
@@ -54,6 +55,7 @@ if __name__ == "__main__":
         use_B,
         zero_means,
         max_variability,
+        system_type,
     )
 
     mccs = []
@@ -69,11 +71,11 @@ if __name__ == "__main__":
             lr=lr,
             model=model,
         )
-        mccs.append(calc_mcc(model, x, s, ar_order))
+        mccs.append(calc_mcc(model, x, s, ar_order, diff_dims=(system_type != "lti")))
 
         print(f"mcc: {mccs[-1]}")
 
-    filename = f"seed_{random_seed}_segment_{num_segment}_comp_{num_comp}_triangular_{triangular}_use_B_{use_B}_use_C_{use_C}_max_variability_{max_variability}.csv"
+    filename = f"seed_{random_seed}_segment_{num_segment}_comp_{num_comp}_triangular_{triangular}_use_B_{use_B}_use_C_{use_C}_max_variability_{max_variability}_{system_type}.csv"
 
     # convert mccs list to numpy and calculate mean and std
     mccs: np.ndarray = np.array(mccs)  # type: ignore
@@ -83,73 +85,6 @@ if __name__ == "__main__":
     print("------------------------------------")
     print(f"mcc_mean: {mcc_mean}, mcc_std: {mcc_std}")
     print("------------------------------------")
-
-    if False and isinstance(model, lti_ica.models.LTINetMLP):
-        # parametrize A, B_inv, C_inv and learn them to match model.net.weight.data in the MSE sense
-
-        A: torch.nn.Parameter = torch.nn.Parameter(torch.randn(num_comp, num_comp))
-        B_inv: torch.nn.Parameter = torch.nn.Parameter(torch.randn(num_comp, num_comp))
-        # C_inv = torch.nn.Parameter(torch.randn(num_comp, num_comp))
-        C_inv: torch.nn.Parameter = torch.eye(num_comp, dtype=torch.float32)
-        eye = torch.eye(num_comp, dtype=torch.float32)
-
-        optimizer = torch.optim.Adam([A, B_inv], lr=3e-3)
-        target = model.net.weight.data.detach()
-
-        # todo: the problem is that the estimate can be unstable (eigval>1)
-
-        for i in range(num_epoch_mse):
-            optimizer.zero_grad()
-            # calculate loss
-
-            est = (
-                B_inv
-                @ torch.cat((eye, eye), dim=1)
-                @ torch.block_diag(C_inv, -A @ C_inv)
-            )
-
-            loss = torch.mean((target - est) ** 2)
-            # backprop
-            loss.backward()
-            optimizer.step()
-
-            if i % 50 == 0:
-                print(f"epoch: {i}, loss: {loss}")
-
-    # evaluate
-    eval = False
-    # generate new data and calculate MSE between predicted and true output
-    # segment_means, segment_variances, x, s = data_gen(num_comp, dt, triangular, use_B)
-
-    if eval is True:
-        # extract the A,B,C matrices from teh model
-        if isinstance(model, lti_ica.models.LTINet):
-            A_est = model.A.detach().numpy()
-            B_est = model.B_inv.inverse().detach().numpy()
-            C_est = model.C_inv.inverse().detach().numpy()
-        elif isinstance(model, lti_ica.models.LTINetMLP):
-            A_est = A.detach().numpy()
-            B_est = B_inv.inverse().detach().numpy()
-            C_est = C_inv.inverse().detach().numpy()
-
-        # create a scipy LTI object from the matrices
-        lti_est = LTISystem(A_est, B_est, C_est, dt=dt)
-
-        # generate new data from a multivariate normal
-        cov = np.diag(np.random.uniform(0.1, 1, size=num_comp))
-        u = np.random.multivariate_normal(
-            np.zeros(num_comp), cov, size=data_per_segment
-        )
-
-        # simulate x from s with lti
-        t, out, state = lti.simulate(u)
-        t, out_est, state_est = lti_est.simulate(u)
-
-        # MSE between x and out_est
-        mse = np.mean((out - out_est) ** 2)
-        print("------------------------------------")
-        print(f"MSE: {mse}")
-        print("------------------------------------")
 
     if save is True:
         # Define your data as a dictionary or a list of dictionaries

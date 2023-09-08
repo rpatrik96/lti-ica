@@ -1,7 +1,7 @@
 import numpy as np
 
 
-from state_space_models.state_space_models.lti import LTISystem
+from state_space_models.state_space_models.lti import LTISystem, SpringMassDamper
 
 
 def generate_segment_stats(
@@ -86,10 +86,17 @@ def data_gen(
     zero_means=True,
     max_variability=False,
     use_C=True,
+    system_type="lti",
 ):
-    lti = LTISystem.controllable_system(
-        num_comp, num_comp, dt=dt, triangular=triangular, use_B=use_B, use_C=use_C
-    )
+    if system_type == "lti":
+        lti = LTISystem.controllable_system(
+            num_comp, num_comp, dt=dt, triangular=triangular, use_B=use_B, use_C=use_C
+        )
+    elif system_type == "spring_mass_damper":
+        lti = SpringMassDamper.from_params(dt=dt)
+    else:
+        raise ValueError(f"Unknown system type {system_type=}")
+
     segment_means, segment_variances = generate_segment_stats(
         num_comp, num_segment, zero_means=zero_means, max_variability=max_variability
     )

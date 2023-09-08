@@ -509,14 +509,20 @@ def correlation(x, y, method="Pearson"):
     return corr_sort, sort_idx, x_sort
 
 
-def calc_mcc(model, x, s, ar_order=1):
+def calc_mcc(model, x, s, ar_order=1, diff_dims=False):
+    if diff_dims is False:
+        assert x.shape[0] == s.shape[0]
+        s_mcc = s[:, 0::2]
+    else:
+        s_mcc = s[: x.shape[0], 0::2]
+
     estimated_factors = model(
         torch.from_numpy(
             x.T.astype(np.float32).reshape([-1, ar_order + 1, x.T.shape[1]])
         )
     )
     mat, _, _ = correlation(
-        s[:, 0::2],  # since we use xt, xtplusone, we only have half the preds
+        s_mcc,  # since we use xt, xtplusone, we only have half the preds
         estimated_factors.detach().numpy().T,
         method="Pearson",
     )
