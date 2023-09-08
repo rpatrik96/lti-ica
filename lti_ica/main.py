@@ -22,7 +22,7 @@ max_variability = False
 system_type = "lti"  # "lti" or "spring_mass_damper"
 
 # Training ----------------------------------------------------
-num_epoch = 3000
+num_epoch = 30
 num_epoch_mse = 1000
 model = "mlp"
 
@@ -71,7 +71,7 @@ if __name__ == "__main__":
         mccs.append(
             calc_mcc(
                 model,
-                dataset.observations.T,
+                dataset.observations,
                 dataset.sources,
                 ar_order,
                 diff_dims=(system_type != "lti"),
