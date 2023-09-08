@@ -5,34 +5,47 @@ from lti_ica.data import generate_segment_stats, generate_nonstationary_data
 from state_space_models.state_space_models.lti import LTISystem
 import lti_ica.models
 import pytest
+from lti_ica.dataset import NonstationaryLTIDataset
 
 
 @pytest.mark.parametrize("model", ["lti", "mlp"])
 def test_calc_mcc(model, num_comp, num_segment, num_segmentdata, dt, ar_order, device):
-    segment_means, segment_variances = generate_segment_stats(
-        num_comp, num_segment, zero_means=False, max_variability=False
-    )
-    lti = LTISystem.controllable_system(num_comp, num_comp, dt=dt)
-    x, s = generate_nonstationary_data(
-        lti, segment_means, segment_variances, num_segmentdata, dt
-    )
+    num_data = num_segment * num_segmentdata
 
-    data = x.T.reshape([-1, ar_order + 1, x.T.shape[1]])
-    data = torch.from_numpy(data.astype(np.float32)).to(device)
+    triangular = False
+    use_B = True
+
+    dataset = NonstationaryLTIDataset(
+        num_comp,
+        num_data,
+        num_segment,
+        dt=dt,
+        triangular=triangular,
+        use_B=use_B,
+        zero_means=False,
+        max_variability=False,
+        use_C=True,
+        ar_order=ar_order,
+    )
 
     if model == "lti":
         model = lti_ica.models.LTINet(
-            num_dim=data.shape[-1],
-            num_class=num_segment,
+            num_dim=dataset.observations.shape[-1],
+            num_class=dataset.num_segment,
             C=False,
-            triangular=False,
-            B=True,
+            triangular=triangular,
+            B=use_B,
         )
     elif model == "mlp":
-        model = lti_ica.models.LTINetMLP(num_dim=data.shape[-1])
+        model = lti_ica.models.LTINetMLP(num_dim=dataset.observations.shape[-1])
 
     model = model.to(device)
     model.train()
 
-    mcc = calc_mcc(model, x, s, ar_order)
+    mcc = calc_mcc(
+        model,
+        dataset.observations,
+        dataset.sources,
+        ar_order,
+    )
     assert isinstance(mcc, float)
