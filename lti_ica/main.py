@@ -1,7 +1,6 @@
 """ Training
     Main script for training the model
 """
-from lti_ica.mcc import calc_mcc
 import pytorch_lightning as pl
 
 # Parameters ==================================================
@@ -34,10 +33,7 @@ num_experiment = 1
 save = True
 
 import numpy as np
-import pandas as pd
 import torch
-
-from lti_ica.dataset import NonstationaryLTIDataset
 
 if __name__ == "__main__":
     # Generate sensor signal --------------------------------------
@@ -64,8 +60,6 @@ if __name__ == "__main__":
     datamodule.setup()
     dataset = datamodule.train_dataloader().dataset
 
-    mccs = []
-
     """use the lightning module to train the model"""
     from runner import LTILightning
 
@@ -89,57 +83,6 @@ if __name__ == "__main__":
 
     """run the training with the lightning module"""
     trainer = pl.Trainer(
-        max_epochs=num_epoch,
-        gradient_clip_val=max_norm,
+        max_epochs=num_epoch, gradient_clip_val=max_norm, val_check_interval=1
     )
     trainer.fit(model, datamodule)
-
-    # run experiments
-    for i in range(num_experiment):
-        mccs.append(
-            calc_mcc(
-                model,
-                dataset.observations,
-                dataset.sources,
-                ar_order,
-                diff_dims=(system_type != "lti"),
-            )
-        )
-
-        print(f"mcc: {mccs[-1]}")
-
-    filename = f"seed_{random_seed}_segment_{num_segment}_comp_{num_comp}_triangular_{triangular}_use_B_{use_B}_use_C_{use_C}_max_variability_{max_variability}_{system_type}.csv"
-
-    # convert mccs list to numpy and calculate mean and std
-    mccs: np.ndarray = np.array(mccs)  # type: ignore
-    mcc_mean = np.mean(mccs)
-    mcc_std = np.std(mccs)
-
-    print("------------------------------------")
-    print(f"mcc_mean: {mcc_mean}, mcc_std: {mcc_std}")
-    print("------------------------------------")
-
-    if save is True:
-        # Define your data as a dictionary or a list of dictionaries
-        data = [
-            {
-                "mcc_mean": mcc_mean,
-                "mcc_std": mcc_std,
-                "random_seed": random_seed,
-                "dt": dt,
-                "num_segment": num_segment,
-                "num_comp": num_comp,
-                "num_data": num_data,
-                "num_epoch": num_epoch,
-                "lr": lr,
-                "use_B": use_B,
-                "use_C": use_C,
-                "triangular": triangular,
-            }
-        ]
-
-        # Create a DataFrame from the data
-        df = pd.DataFrame(data)
-
-        # Save the DataFrame to a CSV file with column names
-        df.to_csv(filename, index=False, header=True, mode="a")
