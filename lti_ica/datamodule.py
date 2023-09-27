@@ -54,7 +54,7 @@ class NonstationaryLTIDatamodule(pl.LightningDataModule):
         )
 
     def train_dataloader(self):
-        return DataLoader(self.dataset, batch_size=self.batch_size, shuffle=True)
+        return DataLoader(self.dataset, batch_size=self.batch_size, shuffle=False)
 
     def val_dataloader(self):
         return DataLoader(self.dataset, batch_size=self.batch_size, shuffle=False)
