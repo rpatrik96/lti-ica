@@ -42,10 +42,5 @@ def test_calc_mcc(model, num_comp, num_segment, num_segmentdata, dt, ar_order, d
     model = model.to(device)
     model.train()
 
-    mcc = calc_mcc(
-        model,
-        dataset.observations,
-        dataset.sources,
-        ar_order,
-    )
+    mcc = calc_mcc(dataset.sources, model(dataset.observations), ar_order)
     assert isinstance(mcc, float)
