@@ -102,4 +102,5 @@ class NonstationaryLTIDataset(Dataset):
             self.observations[idx],
             self.segment_means[idx],
             self.segment_variances[idx],
+            self.sources[idx],
         )
