@@ -39,14 +39,14 @@ def test_generate_segment_stats_max_variability(max_variability, num_comp, num_s
         assert np.all(segment_variances_copy == 0.0001)
 
 
-def test_generate_nonstationary_data(num_comp, num_segment, num_segmentdata, dt):
+def test_generate_nonstationary_data(num_comp, num_segment, num_data_per_segment, dt):
     segment_means, segment_variances = generate_segment_stats(
         num_comp, num_segment, zero_means=False, max_variability=False
     )
     lti = LTISystem.controllable_system(num_comp, num_comp, dt=dt)
     x, s = generate_nonstationary_data(
-        lti, segment_means, segment_variances, num_segmentdata, dt
+        lti, segment_means, segment_variances, num_data_per_segment, dt
     )
-    assert x.shape == (num_comp, num_segmentdata * num_segment)
-    assert s.shape == (num_comp, num_segmentdata * num_segment)
+    assert x.shape == (num_comp, num_data_per_segment * num_segment)
+    assert s.shape == (num_comp, num_data_per_segment * num_segment)
     assert isinstance(lti, LTISystem)
