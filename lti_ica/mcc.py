@@ -1,6 +1,4 @@
 import numpy as np
-import scipy
-import torch
 
 """
 Code for MCC taken from the TCL Repo
@@ -25,6 +23,7 @@ __author__ = "Brian Clapper, bmc@clapper.org"
 __url__ = "http://software.clapper.org/munkres/"
 __copyright__ = "(c) 2008 Brian M. Clapper"
 __license__ = "Apache Software License"
+
 
 # ---------------------------------------------------------------------------
 # Classes
@@ -509,20 +508,10 @@ def correlation(x, y, method="Pearson"):
     return corr_sort, sort_idx, x_sort
 
 
-def calc_mcc(model, x, s, ar_order=1, diff_dims=False):
-    if diff_dims is False:
-        assert x.shape[-1] == s.shape[-1]
-        s_mcc = s[0::2, :]
-    else:
-        s_mcc = s[: x.shape[0], 0::2]
-
-    estimated_factors = model(x)
-
+def calc_mcc(s, s_hat):
     mat, _, _ = correlation(
-        s_mcc.detach()
-        .numpy()
-        .T,  # since we use xt, xtplusone, we only have half the preds
-        estimated_factors.detach().numpy().T,
+        s.detach().numpy().T,
+        s_hat.detach().numpy().T,
         method="Pearson",
     )
     mcc = np.mean(np.abs(np.diag(mat)))
