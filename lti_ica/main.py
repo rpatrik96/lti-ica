@@ -63,7 +63,7 @@ if __name__ == "__main__":
     """use the lightning module to train the model"""
     from runner import LTILightning
 
-    model = LTILightning(
+    runner = LTILightning(
         num_comp,
         num_data,
         num_segment,
@@ -85,4 +85,4 @@ if __name__ == "__main__":
     trainer = pl.Trainer(
         max_epochs=num_epoch, gradient_clip_val=max_norm, val_check_interval=1
     )
-    trainer.fit(model, datamodule)
+    trainer.fit(runner, datamodule)
