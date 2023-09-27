@@ -1,5 +1,6 @@
 import pytest
 from lti_ica.models import LTINet, LTINetMLP
+from lti_ica.datamodule import NonstationaryLTIDatamodule
 import torch
 
 
@@ -41,3 +42,12 @@ def device():
 # @pytest.fixture
 # def lti_mlp_model():
 #     model = lti_ica.models.LTINetMLP(num_dim=data.shape[-1])
+
+
+@pytest.fixture
+def datamodule(num_comp, num_segmentdata, num_segment, dt):
+    num_data = num_segmentdata * num_segment
+    datamodule = NonstationaryLTIDatamodule(num_comp, num_data, num_segment, dt)
+    datamodule.setup()
+
+    return datamodule

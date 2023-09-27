@@ -5,7 +5,7 @@ import lti_ica.models
 
 
 def regularized_log_likelihood(
-    dataset,
+    dataloader,
     num_epoch=1000,
     lr=1e-3,
     triangular=False,
@@ -24,14 +24,16 @@ def regularized_log_likelihood(
 
     if model == "lti":
         model = lti_ica.models.LTINet(
-            num_dim=dataset.observations.shape[-1],
-            num_class=dataset.num_segment,
+            num_dim=dataloader.dataset.observations.shape[-1],
+            num_class=dataloader.dataset.num_segment,
             C=False,
             triangular=triangular,
             B=use_B,
         )
     elif model == "mlp":
-        model = lti_ica.models.LTINetMLP(num_dim=dataset.observations.shape[-1])
+        model = lti_ica.models.LTINetMLP(
+            num_dim=dataloader.dataset.observations.shape[-1]
+        )
 
     model = model.to(device)
     model.train()
@@ -45,12 +47,10 @@ def regularized_log_likelihood(
         latents = []
         log_likelihood = 0
 
-        for (
-            segment,
-            segment_mean,
-            segment_var,
-        ) in dataset:
-            segment_var = segment_var.diag()
+        """iterate over the torch dataloader"""
+
+        for segment, segment_mean, segment_var in dataloader:
+            segment_var = segment_var.squeeze().diag()
 
             latent = model(segment)
 

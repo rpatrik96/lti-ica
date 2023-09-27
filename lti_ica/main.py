@@ -44,7 +44,10 @@ if __name__ == "__main__":
     np.random.seed(random_seed)
     torch.manual_seed(random_seed)
 
-    dataset = NonstationaryLTIDataset(
+    """setup the datamodule"""
+    from datamodule import NonstationaryLTIDatamodule
+
+    datamodule = NonstationaryLTIDatamodule(
         num_comp,
         num_data,
         num_segment,
@@ -56,14 +59,17 @@ if __name__ == "__main__":
         use_C,
         system_type,
         ar_order,
+        batch_size=1,
     )
+    datamodule.setup()
+    dataset = datamodule.train_dataloader().dataset
 
     mccs = []
 
     # run experiments
     for i in range(num_experiment):
         model = regularized_log_likelihood(
-            dataset,
+            datamodule.train_dataloader(),
             num_epoch=num_epoch,
             lr=lr,
             model=model,
