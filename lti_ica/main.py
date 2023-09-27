@@ -2,6 +2,7 @@
     Main script for training the model
 """
 from lti_ica.mcc import calc_mcc
+import pytorch_lightning as pl
 
 # Parameters ==================================================
 # =============================================================
@@ -36,7 +37,6 @@ import numpy as np
 import pandas as pd
 import torch
 
-from lti_ica.training import regularized_log_likelihood
 from lti_ica.dataset import NonstationaryLTIDataset
 
 if __name__ == "__main__":
@@ -66,14 +66,36 @@ if __name__ == "__main__":
 
     mccs = []
 
+    """use the lightning module to train the model"""
+    from runner import LTILightning
+
+    model = LTILightning(
+        num_comp,
+        num_data,
+        num_segment,
+        dt,
+        triangular,
+        use_B,
+        zero_means,
+        max_variability,
+        use_C,
+        system_type,
+        ar_order,
+        batch_size=1,
+        lr=lr,
+        max_norm=max_norm,
+        model=model,
+    )
+
+    """run the training with the lightning module"""
+    trainer = pl.Trainer(
+        max_epochs=num_epoch,
+        gradient_clip_val=max_norm,
+    )
+    trainer.fit(model, datamodule)
+
     # run experiments
     for i in range(num_experiment):
-        model = regularized_log_likelihood(
-            datamodule.train_dataloader(),
-            num_epoch=num_epoch,
-            lr=lr,
-            model=model,
-        )
         mccs.append(
             calc_mcc(
                 model,
