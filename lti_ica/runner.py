@@ -6,6 +6,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.optim import SGD
 from torch.utils.data import DataLoader
+from lti_ica.mcc import calc_mcc
 
 from lti_ica.dataset import NonstationaryLTIDataset
 from lti_ica.models import LTINetMLP, LTINet
@@ -25,7 +26,7 @@ class LTILightning(pl.LightningModule):
         use_C=True,
         system_type="lti",
         ar_order=1,
-        batch_size=64,
+        batch_size=1,
         lr=1e-3,
         max_norm=1.0,
         model="mlp",
@@ -49,18 +50,47 @@ class LTILightning(pl.LightningModule):
             self.model = LTINetMLP(num_dim=self.hparams.num_comp)
 
     def training_step(self, batch, batch_idx):
-        segment, segment_mean, segment_var = batch
-        segment_var = segment_var.squeeze().diag()
+        (
+            log_likelihood,
+            segment,
+            segment_mean,
+            segment_var,
+            sources,
+            latent,
+        ) = self._forward(batch)
+
+        self.log("train_log_likelihood", log_likelihood)
+
+        return -log_likelihood
+
+    def _forward(self, batch):
+        segment, segment_mean, segment_var, sources = batch
+
+        # convert segment_var from size (batch, dim) to (batch, dim, dim) such that it is a batch of diagonal matrices
+        segment_var = segment_var.diag_embed()
 
         latent = self.model(segment)
-
         log_likelihood = (
             torch.distributions.MultivariateNormal(segment_mean, segment_var)
             .log_prob(latent)
             .mean()
         )
+        return log_likelihood, segment, segment_mean, segment_var, sources, latent
 
-        self.log("train_log_likelihood", log_likelihood)
+    def validation_step(self, batch, batch_idx):
+        (
+            log_likelihood,
+            segment,
+            segment_mean,
+            segment_var,
+            sources,
+            latent,
+        ) = self._forward(batch)
+
+        mcc = calc_mcc(s=sources, s_hat=latent)
+
+        self.log("val_log_likelihood", log_likelihood)
+        self.log("val_mcc", mcc)
 
         return -log_likelihood
 
