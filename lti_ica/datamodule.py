@@ -1,9 +1,7 @@
 """A pytorch lightning datamodule that uses the dataset class from `dataset.py`"""
 
-
-from torch.utils.data import DataLoader
 import pytorch_lightning as pl
-import torch
+from torch.utils.data import DataLoader
 
 from lti_ica.dataset import NonstationaryLTIDataset
 
@@ -12,7 +10,7 @@ class NonstationaryLTIDatamodule(pl.LightningDataModule):
     def __init__(
         self,
         num_comp,
-        num_data,
+        num_data_per_segment,
         num_segment,
         dt,
         triangular=False,
@@ -25,39 +23,38 @@ class NonstationaryLTIDatamodule(pl.LightningDataModule):
         batch_size=64,
     ):
         super().__init__()
-        self.num_comp = num_comp
-        self.num_data = num_data
-        self.num_segment = num_segment
-        self.dt = dt
-        self.triangular = triangular
-        self.use_B = use_B
-        self.zero_means = zero_means
-        self.use_C = use_C
-        self.max_variability = max_variability
-        self.system_type = system_type
-        self.ar_order = ar_order
-        self.batch_size = batch_size
+        self.save_hyperparameters()
+
+        self.hparams.num_data = (
+            self.hparams.num_data_per_segment * self.hparams.num_segment
+        )
 
     def setup(self, stage=None):
         self.dataset = NonstationaryLTIDataset(
-            num_comp=self.num_comp,
-            num_data=self.num_data,
-            num_segment=self.num_segment,
-            dt=self.dt,
-            triangular=self.triangular,
-            use_B=self.use_B,
-            zero_means=self.zero_means,
-            use_C=self.use_C,
-            max_variability=self.max_variability,
-            system_type=self.system_type,
-            ar_order=self.ar_order,
+            num_comp=self.hparams.num_comp,
+            num_data=self.hparams.num_data,
+            num_segment=self.hparams.num_segment,
+            dt=self.hparams.dt,
+            triangular=self.hparams.triangular,
+            use_B=self.hparams.use_B,
+            zero_means=self.hparams.zero_means,
+            use_C=self.hparams.use_C,
+            max_variability=self.hparams.max_variability,
+            system_type=self.hparams.system_type,
+            ar_order=self.hparams.ar_order,
         )
 
     def train_dataloader(self):
-        return DataLoader(self.dataset, batch_size=self.batch_size, shuffle=False)
+        return DataLoader(
+            self.dataset, batch_size=self.hparams.batch_size, shuffle=False
+        )
 
     def val_dataloader(self):
-        return DataLoader(self.dataset, batch_size=self.batch_size, shuffle=False)
+        return DataLoader(
+            self.dataset, batch_size=self.hparams.batch_size, shuffle=False
+        )
 
     def test_dataloader(self):
-        return DataLoader(self.dataset, batch_size=self.batch_size, shuffle=False)
+        return DataLoader(
+            self.dataset, batch_size=self.hparams.batch_size, shuffle=False
+        )
