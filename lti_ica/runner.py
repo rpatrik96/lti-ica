@@ -2,13 +2,9 @@
 
 import pytorch_lightning as pl
 import torch
-import torch.nn as nn
-import torch.nn.functional as F
 from torch.optim import SGD
-from torch.utils.data import DataLoader
-from lti_ica.mcc import calc_mcc
 
-from lti_ica.dataset import NonstationaryLTIDataset
+from lti_ica.mcc import calc_mcc
 from lti_ica.models import LTINetMLP, LTINet
 
 
@@ -24,11 +20,8 @@ class LTILightning(pl.LightningModule):
         zero_means=True,
         max_variability=False,
         use_C=True,
-        system_type="lti",
         ar_order=1,
-        batch_size=1,
         lr=1e-3,
-        max_norm=1.0,
         model="mlp",
     ):
         super().__init__()
