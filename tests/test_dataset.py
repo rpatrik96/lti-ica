@@ -6,9 +6,9 @@ import pytest
 
 @pytest.mark.parametrize("triangular", [True, False])
 def test_dataset_default_params(
-    triangular, num_comp, num_segment, num_segmentdata, dt, ar_order
+    triangular, num_comp, num_segment, num_data_per_segment, dt, ar_order
 ):
-    num_data = num_segmentdata * num_segment
+    num_data = num_data_per_segment * num_segment
     dataset = NonstationaryLTIDataset(
         num_comp, num_data, num_segment, dt=dt, triangular=triangular, ar_order=ar_order
     )
@@ -25,9 +25,9 @@ def test_dataset_default_params(
 
 @pytest.mark.parametrize("use_B", [True, False])
 def test_dataset_custom_params_B(
-    use_B, num_comp, num_segment, num_segmentdata, dt, ar_order
+    use_B, num_comp, num_segment, num_data_per_segment, dt, ar_order
 ):
-    num_data = num_segment * num_segmentdata
+    num_data = num_segment * num_data_per_segment
     triangular = False
     dataset = NonstationaryLTIDataset(
         num_comp,
@@ -54,9 +54,9 @@ def test_dataset_custom_params_B(
 
 @pytest.mark.parametrize("use_C", [True, False])
 def test_dataset_custom_params_C(
-    use_C, num_comp, num_segment, num_segmentdata, dt, ar_order
+    use_C, num_comp, num_segment, num_data_per_segment, dt, ar_order
 ):
-    num_data = num_segment * num_segmentdata
+    num_data = num_segment * num_data_per_segment
     triangular = False
     dataset = NonstationaryLTIDataset(
         num_comp,

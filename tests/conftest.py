@@ -16,7 +16,7 @@ def num_segment():
 
 
 @pytest.fixture
-def num_segmentdata():
+def num_data_per_segment():
     return 3000
 
 
@@ -36,8 +36,8 @@ def device():
 
 
 @pytest.fixture
-def datamodule(num_comp, num_segmentdata, num_segment, dt):
-    num_data = num_segmentdata * num_segment
+def datamodule(num_comp, num_data_per_segment, num_segment, dt):
+    num_data = num_data_per_segment * num_segment
     datamodule = NonstationaryLTIDatamodule(num_comp, num_data, num_segment, dt)
     datamodule.setup()
 
@@ -45,6 +45,6 @@ def datamodule(num_comp, num_segmentdata, num_segment, dt):
 
 
 @pytest.fixture
-def runner(num_comp, num_segmentdata, num_segment, dt):
-    num_data = num_segmentdata * num_segment
+def runner(num_comp, num_data_per_segment, num_segment, dt):
+    num_data = num_data_per_segment * num_segment
     return LTILightning(num_comp, num_data, num_segment, dt)
