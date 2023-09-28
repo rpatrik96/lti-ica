@@ -45,7 +45,10 @@ class NonstationaryLTIDataset(Dataset):
         self.ar_order = ar_order
 
         # Remake label for TCL learning
-        self.num_segmentdata = int(np.ceil(self.num_data / self.num_segment))
+        self.num_data_per_segment = int(np.ceil(self.num_data / self.num_segment))
+
+        # this ensures that after reshaping there is no overlap between segments in an observation tuple
+        assert self.num_data_per_segment % (self.ar_order + 1) == 0
 
         if system_type == "lti":
             self.lti = LTISystem.controllable_system(
@@ -68,19 +71,25 @@ class NonstationaryLTIDataset(Dataset):
             max_variability=self.max_variability,
         )
 
-        observations, sources = generate_nonstationary_data(
+        observations, states, controls = generate_nonstationary_data(
             self.lti,
             self.segment_means,
             self.segment_variances,
-            self.num_segmentdata,
+            self.num_data_per_segment,
             self.dt,
         )
 
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-        observations = observations.reshape(
-            [-1, self.ar_order + 1, observations.shape[0]]
+        segment_indices = np.repeat(
+            np.arange(self.num_segment), self.num_data_per_segment
         )
+
+        self.segment_indices = torch.from_numpy(segment_indices.astype(int)).to(
+            self.device
+        )
+
+        observations = observations.reshape([-1, self.ar_order + 1, self.num_comp])
 
         self.observations = torch.from_numpy(observations.astype(np.float32)).to(
             self.device
@@ -92,15 +101,21 @@ class NonstationaryLTIDataset(Dataset):
             self.device
         )
 
-        self.sources = torch.from_numpy(sources.T.astype(np.float32)).to(self.device)
+        states = states.reshape([-1, self.ar_order + 1, self.num_comp])
+        self.states = torch.from_numpy(states.astype(np.float32)).to(self.device)
+        self.controls = torch.from_numpy(controls.astype(np.float32)).to(self.device)
 
     def __len__(self):
-        return self.num_segment
+        return self.observations.shape[0]
 
     def __getitem__(self, idx):
+        # observations contains (y_t, y_{t+1},...,y_{t+ar_order-1}) which can be used to predict u_t
+        segment_idx = self.segment_indices[(self.ar_order + 1) * idx]
         return (
             self.observations[idx],
-            self.segment_means[idx],
-            self.segment_variances[idx],
-            self.sources[idx],
+            self.states[idx],
+            self.controls[(self.ar_order + 1) * idx],
+            segment_idx,
+            self.segment_means[segment_idx],
+            self.segment_variances[segment_idx],
         )

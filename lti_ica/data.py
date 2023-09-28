@@ -1,9 +1,6 @@
 import numpy as np
 
 
-from state_space_models.state_space_models.lti import LTISystem, SpringMassDamper
-
-
 def generate_segment_stats(
     num_comp, num_segment, zero_means=False, max_variability=False
 ):
@@ -50,27 +47,29 @@ def generate_segment_stats(
 
 
 def generate_nonstationary_data(
-    lti, segment_means, segment_variances, num_segmentdata, dt
+    lti, segment_means, segment_variances, num_data_per_segment, dt
 ):
     # iterate over the segment variances,
     # generate multivariate normal with each variance,
     # and simulate it with the LTI system
     obs = []
     states = []
+    controls = []
     for i, (segment_mean, segment_var) in enumerate(
         zip(segment_means, segment_variances)
     ):
         segment_U = np.random.multivariate_normal(
-            segment_mean, np.diag(segment_var), num_segmentdata
+            segment_mean, np.diag(segment_var), num_data_per_segment
         )
 
         _, segment_obs, segment_state = lti.simulate(segment_U, dt=dt)
 
         obs.append(segment_obs)
         states.append(segment_state)
+        controls.append(segment_U)
+
     obs = np.concatenate(obs, axis=0)
     states = np.concatenate(states, axis=0)
-    x = obs.T
-    s = states.T
+    controls = np.concatenate(controls, axis=0)
 
-    return x, s
+    return obs, states, controls

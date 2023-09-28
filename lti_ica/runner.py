@@ -45,11 +45,10 @@ class LTILightning(pl.LightningModule):
     def training_step(self, batch, batch_idx):
         (
             log_likelihood,
-            segment,
-            segment_mean,
-            segment_var,
-            sources,
-            latent,
+            observations,
+            states,
+            controls,
+            predicted_control,
         ) = self._forward(batch)
 
         self.log("train_log_likelihood", log_likelihood)
@@ -57,30 +56,37 @@ class LTILightning(pl.LightningModule):
         return -log_likelihood
 
     def _forward(self, batch):
-        segment, segment_mean, segment_var, sources = batch
+        (
+            observations,
+            states,
+            controls,
+            segment_indices,
+            segment_means,
+            segment_variances,
+        ) = batch
 
-        # convert segment_var from size (batch, dim) to (batch, dim, dim) such that it is a batch of diagonal matrices
-        segment_var = segment_var.diag_embed()
+        # convert segment_var from size (batch, num_segment, dim) to (batch, num_segment, dim, dim)
+        # such that it is a batch of diagonal matrices
+        segment_variances = segment_variances.diag_embed()
 
-        latent = self.model(segment)
+        predicted_control = self.model(observations)
         log_likelihood = (
-            torch.distributions.MultivariateNormal(segment_mean, segment_var)
-            .log_prob(latent)
+            torch.distributions.MultivariateNormal(segment_means, segment_variances)
+            .log_prob(predicted_control)
             .mean()
         )
-        return log_likelihood, segment, segment_mean, segment_var, sources, latent
+        return log_likelihood, observations, states, controls, predicted_control
 
     def validation_step(self, batch, batch_idx):
         (
             log_likelihood,
-            segment,
-            segment_mean,
-            segment_var,
-            sources,
-            latent,
+            observations,
+            states,
+            controls,
+            predicted_control,
         ) = self._forward(batch)
 
-        mcc = calc_mcc(s=sources, s_hat=latent)
+        mcc = calc_mcc(s=controls, s_hat=predicted_control)
 
         self.log("val_log_likelihood", log_likelihood)
         self.log("val_mcc", mcc)
