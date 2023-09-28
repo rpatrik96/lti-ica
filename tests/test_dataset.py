@@ -12,8 +12,14 @@ def test_dataset_default_params(
     dataset = NonstationaryLTIDataset(
         num_comp, num_data, num_segment, dt=dt, triangular=triangular, ar_order=ar_order
     )
-    assert len(dataset.segment_means) == num_segment
-    assert len(dataset.segment_variances) == num_segment
+    assert dataset.segment_means.shape == (
+        dataset.num_segment,
+        dataset.num_comp,
+    )
+    assert dataset.segment_variances.shape == (
+        dataset.num_segment,
+        dataset.num_comp,
+    )
     assert dataset.observations.shape == (
         num_data // (ar_order + 1),
         ar_order + 1,
