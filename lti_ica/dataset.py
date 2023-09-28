@@ -90,6 +90,7 @@ class NonstationaryLTIDataset(Dataset):
             self.device
         )
 
+        states = states.reshape([-1, self.ar_order + 1, self.num_comp])
         self.states = torch.from_numpy(states.astype(np.float32)).to(self.device)
         self.controls = torch.from_numpy(controls.astype(np.float32)).to(self.device)
 
