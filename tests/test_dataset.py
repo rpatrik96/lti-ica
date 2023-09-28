@@ -26,6 +26,7 @@ def test_dataset_default_params(
         num_comp,
     )
     assert dataset.states.shape == (num_data, num_comp)
+    assert dataset.controls.shape == (num_data, num_comp)
     assert isinstance(dataset.lti, LTISystem)
 
 

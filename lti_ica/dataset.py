@@ -68,7 +68,7 @@ class NonstationaryLTIDataset(Dataset):
             max_variability=self.max_variability,
         )
 
-        observations, states = generate_nonstationary_data(
+        observations, states, controls = generate_nonstationary_data(
             self.lti,
             self.segment_means,
             self.segment_variances,
@@ -91,6 +91,7 @@ class NonstationaryLTIDataset(Dataset):
         )
 
         self.states = torch.from_numpy(states.astype(np.float32)).to(self.device)
+        self.controls = torch.from_numpy(controls.astype(np.float32)).to(self.device)
 
     def __len__(self):
         return self.observations.shape[0]
