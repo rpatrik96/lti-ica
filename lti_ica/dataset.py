@@ -45,7 +45,7 @@ class NonstationaryLTIDataset(Dataset):
         self.ar_order = ar_order
 
         # Remake label for TCL learning
-        self.num_segmentdata = int(np.ceil(self.num_data / self.num_segment))
+        self.num_data_per_segment = int(np.ceil(self.num_data / self.num_segment))
 
         if system_type == "lti":
             self.lti = LTISystem.controllable_system(
@@ -72,7 +72,7 @@ class NonstationaryLTIDataset(Dataset):
             self.lti,
             self.segment_means,
             self.segment_variances,
-            self.num_segmentdata,
+            self.num_data_per_segment,
             self.dt,
         )
 
