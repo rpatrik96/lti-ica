@@ -25,7 +25,11 @@ def test_dataset_default_params(
         ar_order + 1,
         num_comp,
     )
-    assert dataset.states.shape == (num_data, num_comp)
+    assert dataset.states.shape == (
+        num_data // (ar_order + 1),
+        ar_order + 1,
+        num_comp,
+    )
     assert dataset.controls.shape == (num_data, num_comp)
     assert isinstance(dataset.lti, LTISystem)
 
@@ -101,6 +105,8 @@ def test_return_correct_tensor_shapes(
     )
     dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=False)
 
-    observations = next(iter(dataloader))
+    observations, states, controls = next(iter(dataloader))
 
     assert observations.shape == (batch_size, dataset.ar_order + 1, dataset.num_comp)
+    assert states.shape == (batch_size, dataset.ar_order + 1, dataset.num_comp)
+    assert controls.shape == (batch_size, dataset.num_comp)

@@ -98,4 +98,9 @@ class NonstationaryLTIDataset(Dataset):
         return self.observations.shape[0]
 
     def __getitem__(self, idx):
-        return self.observations[idx]
+        # observations contains (y_t, y_{t+1},...,y_{t+ar_order-1}) which can be used to predict u_t
+        return (
+            self.observations[idx],
+            self.states[idx],
+            self.controls[(self.ar_order + 1) * idx],
+        )
