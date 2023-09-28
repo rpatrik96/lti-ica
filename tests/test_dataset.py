@@ -31,6 +31,7 @@ def test_dataset_default_params(
         num_comp,
     )
     assert dataset.controls.shape == (num_data, num_comp)
+    assert dataset.segment_indices.shape == (num_data,)
     assert isinstance(dataset.lti, LTISystem)
 
 
@@ -52,14 +53,25 @@ def test_dataset_custom_params_B(
         use_C=True,
         ar_order=ar_order,
     )
-    assert len(dataset.segment_means) == num_segment
-    assert len(dataset.segment_variances) == num_segment
+    assert dataset.segment_means.shape == (
+        dataset.num_segment,
+        dataset.num_comp,
+    )
+    assert dataset.segment_variances.shape == (
+        dataset.num_segment,
+        dataset.num_comp,
+    )
     assert dataset.observations.shape == (
         num_data // (ar_order + 1),
         ar_order + 1,
         num_comp,
     )
-    assert dataset.states.shape == (num_data, num_comp)
+    assert dataset.states.shape == (
+        num_data // (ar_order + 1),
+        ar_order + 1,
+        num_comp,
+    )
+    assert dataset.controls.shape == (num_data, num_comp)
     assert isinstance(dataset.lti, LTISystem)
 
 
@@ -81,14 +93,25 @@ def test_dataset_custom_params_C(
         use_C=use_C,
         ar_order=ar_order,
     )
-    assert len(dataset.segment_means) == num_segment
-    assert len(dataset.segment_variances) == num_segment
+    assert dataset.segment_means.shape == (
+        dataset.num_segment,
+        dataset.num_comp,
+    )
+    assert dataset.segment_variances.shape == (
+        dataset.num_segment,
+        dataset.num_comp,
+    )
     assert dataset.observations.shape == (
         num_data // (ar_order + 1),
         ar_order + 1,
         num_comp,
     )
-    assert dataset.states.shape == (num_data, num_comp)
+    assert dataset.states.shape == (
+        num_data // (ar_order + 1),
+        ar_order + 1,
+        num_comp,
+    )
+    assert dataset.controls.shape == (num_data, num_comp)
     assert isinstance(dataset.lti, LTISystem)
 
 
@@ -105,7 +128,7 @@ def test_return_correct_tensor_shapes(
     )
     dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=False)
 
-    observations, states, controls = next(iter(dataloader))
+    observations, states, controls, _, _, _ = next(iter(dataloader))
 
     assert observations.shape == (batch_size, dataset.ar_order + 1, dataset.num_comp)
     assert states.shape == (batch_size, dataset.ar_order + 1, dataset.num_comp)

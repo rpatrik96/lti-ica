@@ -47,6 +47,13 @@ class NonstationaryLTIDataset(Dataset):
         # Remake label for TCL learning
         self.num_data_per_segment = int(np.ceil(self.num_data / self.num_segment))
 
+        # this ensures that after reshaping there is no overlap between segments in an observation tuple
+        assert self.num_data_per_segment % (self.ar_order + 1) == 0
+
+        self.segment_indices = np.repeat(
+            np.arange(self.num_segment), self.num_data_per_segment
+        )
+
         if system_type == "lti":
             self.lti = LTISystem.controllable_system(
                 self.num_comp,
@@ -103,4 +110,7 @@ class NonstationaryLTIDataset(Dataset):
             self.observations[idx],
             self.states[idx],
             self.controls[(self.ar_order + 1) * idx],
+            self.segment_indices[(self.ar_order + 1) * idx],
+            self.segment_means,
+            self.segment_variances,
         )
