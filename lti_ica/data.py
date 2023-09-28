@@ -54,6 +54,7 @@ def generate_nonstationary_data(
     # and simulate it with the LTI system
     obs = []
     states = []
+    controls = []
     for i, (segment_mean, segment_var) in enumerate(
         zip(segment_means, segment_variances)
     ):
@@ -65,7 +66,10 @@ def generate_nonstationary_data(
 
         obs.append(segment_obs)
         states.append(segment_state)
+        controls.append(segment_U)
+
     obs = np.concatenate(obs, axis=0)
     states = np.concatenate(states, axis=0)
+    controls = np.concatenate(controls, axis=0)
 
-    return obs, states
+    return obs, states, controls
