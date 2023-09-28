@@ -95,7 +95,7 @@ class NonstationaryLTIDataset(Dataset):
         self.sources = torch.from_numpy(sources.T.astype(np.float32)).to(self.device)
 
     def __len__(self):
-        return self.num_segment
+        return self.observations.shape[0]
 
     def __getitem__(self, idx):
         return (
