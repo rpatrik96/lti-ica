@@ -50,7 +50,7 @@ def generate_segment_stats(
 
 
 def generate_nonstationary_data(
-    lti, segment_means, segment_variances, num_segmentdata, dt
+    lti, segment_means, segment_variances, num_data_per_segment, dt
 ):
     # iterate over the segment variances,
     # generate multivariate normal with each variance,
@@ -61,7 +61,7 @@ def generate_nonstationary_data(
         zip(segment_means, segment_variances)
     ):
         segment_U = np.random.multivariate_normal(
-            segment_mean, np.diag(segment_var), num_segmentdata
+            segment_mean, np.diag(segment_var), num_data_per_segment
         )
 
         _, segment_obs, segment_state = lti.simulate(segment_U, dt=dt)
