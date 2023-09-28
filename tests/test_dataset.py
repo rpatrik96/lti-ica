@@ -85,3 +85,21 @@ def test_dataset_custom_params_C(
     )
     assert dataset.states.shape == (num_data, num_comp)
     assert isinstance(dataset.lti, LTISystem)
+
+
+from torch.utils.data import DataLoader
+
+
+@pytest.mark.parametrize("batch_size", [1, 64])
+def test_return_correct_tensor_shapes(
+    batch_size, num_comp, num_segment, num_data_per_segment, dt, ar_order
+):
+    num_data = num_data_per_segment * num_segment
+    dataset = NonstationaryLTIDataset(
+        num_comp, num_data, num_segment, dt=dt, ar_order=ar_order, triangular=False
+    )
+    dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=False)
+
+    observations = next(iter(dataloader))
+
+    assert observations.shape == (batch_size, dataset.ar_order + 1, dataset.num_comp)
