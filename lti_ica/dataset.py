@@ -78,9 +78,7 @@ class NonstationaryLTIDataset(Dataset):
 
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-        observations = observations.reshape(
-            [-1, self.ar_order + 1, observations.shape[0]]
-        )
+        observations = observations.reshape([-1, self.ar_order + 1, self.num_comp])
 
         self.observations = torch.from_numpy(observations.astype(np.float32)).to(
             self.device
