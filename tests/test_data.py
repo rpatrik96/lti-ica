@@ -44,9 +44,10 @@ def test_generate_nonstationary_data(num_comp, num_segment, num_data_per_segment
         num_comp, num_segment, zero_means=False, max_variability=False
     )
     lti = LTISystem.controllable_system(num_comp, num_comp, dt=dt)
-    x, s = generate_nonstationary_data(
+    obs, states, control = generate_nonstationary_data(
         lti, segment_means, segment_variances, num_data_per_segment, dt
     )
-    assert x.shape == (num_comp, num_data_per_segment * num_segment)
-    assert s.shape == (num_comp, num_data_per_segment * num_segment)
+    assert obs.shape == (num_data_per_segment * num_segment, num_comp)
+    assert states.shape == (num_data_per_segment * num_segment, num_comp)
+    assert control.shape == (num_data_per_segment * num_segment, num_comp)
     assert isinstance(lti, LTISystem)
