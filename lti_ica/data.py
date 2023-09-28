@@ -1,9 +1,6 @@
 import numpy as np
 
 
-from state_space_models.state_space_models.lti import LTISystem, SpringMassDamper
-
-
 def generate_segment_stats(
     num_comp, num_segment, zero_means=False, max_variability=False
 ):
