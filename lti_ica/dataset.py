@@ -98,9 +98,4 @@ class NonstationaryLTIDataset(Dataset):
         return self.observations.shape[0]
 
     def __getitem__(self, idx):
-        return (
-            self.observations[idx],
-            self.segment_means[idx],
-            self.segment_variances[idx],
-            self.sources[idx],
-        )
+        return self.observations[idx]
