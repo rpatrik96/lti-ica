@@ -50,10 +50,6 @@ class NonstationaryLTIDataset(Dataset):
         # this ensures that after reshaping there is no overlap between segments in an observation tuple
         assert self.num_data_per_segment % (self.ar_order + 1) == 0
 
-        self.segment_indices = np.repeat(
-            np.arange(self.num_segment), self.num_data_per_segment
-        )
-
         if system_type == "lti":
             self.lti = LTISystem.controllable_system(
                 self.num_comp,
@@ -85,6 +81,14 @@ class NonstationaryLTIDataset(Dataset):
 
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
+        segment_indices = np.repeat(
+            np.arange(self.num_segment), self.num_data_per_segment
+        )
+
+        self.segment_indices = torch.from_numpy(segment_indices.astype(int)).to(
+            self.device
+        )
+
         observations = observations.reshape([-1, self.ar_order + 1, self.num_comp])
 
         self.observations = torch.from_numpy(observations.astype(np.float32)).to(
@@ -106,11 +110,12 @@ class NonstationaryLTIDataset(Dataset):
 
     def __getitem__(self, idx):
         # observations contains (y_t, y_{t+1},...,y_{t+ar_order-1}) which can be used to predict u_t
+        segment_idx = self.segment_indices[(self.ar_order + 1) * idx]
         return (
             self.observations[idx],
             self.states[idx],
             self.controls[(self.ar_order + 1) * idx],
-            self.segment_indices[(self.ar_order + 1) * idx],
-            self.segment_means,
-            self.segment_variances,
+            segment_idx,
+            self.segment_means[segment_idx],
+            self.segment_variances[segment_idx],
         )
