@@ -67,7 +67,5 @@ def generate_nonstationary_data(
         states.append(segment_state)
     obs = np.concatenate(obs, axis=0)
     states = np.concatenate(states, axis=0)
-    x = obs.T
-    s = states.T
 
-    return x, s
+    return obs, states

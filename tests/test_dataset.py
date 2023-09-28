@@ -19,7 +19,7 @@ def test_dataset_default_params(
         ar_order + 1,
         num_comp,
     )
-    assert dataset.sources.shape == (num_data, num_comp)
+    assert dataset.states.shape == (num_data, num_comp)
     assert isinstance(dataset.lti, LTISystem)
 
 
@@ -48,7 +48,7 @@ def test_dataset_custom_params_B(
         ar_order + 1,
         num_comp,
     )
-    assert dataset.sources.shape == (num_data, num_comp)
+    assert dataset.states.shape == (num_data, num_comp)
     assert isinstance(dataset.lti, LTISystem)
 
 
@@ -77,5 +77,5 @@ def test_dataset_custom_params_C(
         ar_order + 1,
         num_comp,
     )
-    assert dataset.sources.shape == (num_data, num_comp)
+    assert dataset.states.shape == (num_data, num_comp)
     assert isinstance(dataset.lti, LTISystem)
