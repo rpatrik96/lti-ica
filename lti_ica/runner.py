@@ -23,6 +23,7 @@ class LTILightning(pl.LightningModule):
         ar_order=1,
         lr=1e-3,
         model="mlp",
+        offline=True,
     ):
         super().__init__()
 
@@ -52,6 +53,10 @@ class LTILightning(pl.LightningModule):
         ) = self._forward(batch)
 
         self.log("train_log_likelihood", log_likelihood)
+
+        mcc = calc_mcc(s=controls, s_hat=predicted_control)
+
+        self.log("train_mcc", mcc)
 
         return -log_likelihood
 
