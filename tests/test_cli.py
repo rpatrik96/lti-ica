@@ -20,5 +20,5 @@ def test_cli_fast_dev_run():
         save_config_callback=None,
         run=True,
         args=args,
-        parser_kwargs={"parse_as_dict": False},
+        parser_kwargs={"parse_as_dict": False, "parser_mode": "omegaconf"},
     )
