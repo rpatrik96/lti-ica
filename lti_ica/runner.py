@@ -54,6 +54,10 @@ class LTILightning(pl.LightningModule):
 
         self.log("train_log_likelihood", log_likelihood)
 
+        mcc = calc_mcc(s=controls, s_hat=predicted_control)
+
+        self.log("train_mcc", mcc)
+
         return -log_likelihood
 
     def _forward(self, batch):
