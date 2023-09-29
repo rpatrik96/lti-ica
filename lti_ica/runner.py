@@ -23,6 +23,7 @@ class LTILightning(pl.LightningModule):
         ar_order=1,
         lr=1e-3,
         model="mlp",
+        offline=True,
     ):
         super().__init__()
 

@@ -50,6 +50,7 @@ model:
   zero_means: true
   lr: 0.001
   model: mlp
+  offline: true
 data:
   num_comp: 2
   num_data_per_segment: 2048
