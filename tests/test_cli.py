@@ -13,6 +13,8 @@ def test_cli_fast_dev_run():
         config_path,
         "--trainer.fast_dev_run",
         "true",
+        "--trainer.logger",
+        "null",
     ]
     cli = LTILightningCLI(
         LTILightning,
