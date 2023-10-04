@@ -510,8 +510,8 @@ def correlation(x, y, method="Pearson"):
 
 def calc_mcc(s, s_hat):
     mat, _, _ = correlation(
-        s.detach().numpy().T,
-        s_hat.detach().numpy().T,
+        s.detach().cpu().numpy().T,
+        s_hat.detach().cpu().numpy().T,
         method="Pearson",
     )
     mcc = np.mean(np.abs(np.diag(mat)))
