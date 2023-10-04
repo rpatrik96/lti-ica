@@ -25,6 +25,14 @@ class NonstationaryLTIDatamodule(pl.LightningDataModule):
         super().__init__()
         self.save_hyperparameters()
 
+        if type(self.hparams.num_segment) == int:
+            self.hparams.num_segment = (
+                self.hparams.num_segment * self.hparams.num_comp + 1
+            )
+            print(
+                f"num_segment was an int, so it was changed to {self.hparams.num_segment}"
+            )
+
         self.hparams.num_data = (
             self.hparams.num_data_per_segment * self.hparams.num_segment
         )

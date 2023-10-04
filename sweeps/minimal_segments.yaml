@@ -18,7 +18,7 @@ parameters:
   data.num_comp:
       values: [2, 3, 5, 8, 10]
   data.num_segment:
-      value: ${data.num_comp}+1
+      value: 1
   data.zero_means:
     values: [false, true]
   data.use_B:
