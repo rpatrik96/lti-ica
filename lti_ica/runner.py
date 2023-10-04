@@ -36,7 +36,7 @@ class LTILightning(pl.LightningModule):
             self.model = LTINet(
                 num_dim=self.hparams.num_comp,
                 num_class=self.hparams.num_segment,
-                C=False,
+                C=self.hparams.use_C,
                 triangular=self.hparams.triangular,
                 B=self.hparams.use_B,
             )

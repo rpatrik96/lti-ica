@@ -14,7 +14,7 @@ trainer:
   precision: 32-true
   callbacks: null
   fast_dev_run: false
-  max_epochs: null
+  max_epochs: 3000
   min_epochs: null
   max_steps: -1
   min_steps: null
@@ -25,9 +25,9 @@ trainer:
   limit_predict_batches: null
   overfit_batches: 0.0
   val_check_interval: null
-  check_val_every_n_epoch: 1
+  check_val_every_n_epoch: 10
   num_sanity_val_steps: null
-  log_every_n_steps: null
+  log_every_n_steps: 20
   enable_checkpointing: null
   enable_progress_bar: null
   enable_model_summary: null
@@ -53,7 +53,7 @@ model:
   offline: true
 data:
   num_comp: 2
-  num_data_per_segment: 2048
+  num_data_per_segment: 12000
   num_segment: 3
   dt: 0.003
   triangular: false
