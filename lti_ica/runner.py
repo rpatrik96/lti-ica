@@ -1,7 +1,12 @@
 """pytorch lightning module for training the ICA model"""
 
+import subprocess
+from os.path import dirname
+
 import pytorch_lightning as pl
+import pytorch_lightning.loggers.wandb
 import torch
+import wandb
 from torch.optim import SGD
 
 from lti_ica.mcc import calc_mcc
@@ -100,3 +105,15 @@ class LTILightning(pl.LightningModule):
 
     def configure_optimizers(self):
         return SGD(self.parameters(), lr=self.hparams.lr)
+
+    def on_fit_end(self) -> None:
+        if isinstance(self.logger, pl.loggers.wandb.WandbLogger) is True:
+            if self.hparams.offline is True:
+                # Syncing W&B at the end
+                # 1. save sync dir (after marking a run finished, the W&B object changes (is teared down?)
+                # print(self.logger.experiment.__dict__)
+                sync_dir = dirname(self.logger.experiment.dir)
+                # 2. mark run complete
+                wandb.finish()  # type: ignore [attr-defined]
+                # 3. call the sync command for the run directory
+                subprocess.check_call(["wandb", "sync", sync_dir])
