@@ -108,12 +108,12 @@ class LTILightning(pl.LightningModule):
 
     def on_fit_end(self) -> None:
         if isinstance(self.logger, pl.loggers.wandb.WandbLogger) is True:
-            if self.hparams.offline is True:
+            if self.hparams.offline is True:  # type: ignore [attr-defined]
                 # Syncing W&B at the end
                 # 1. save sync dir (after marking a run finished, the W&B object changes (is teared down?)
                 # print(self.logger.experiment.__dict__)
-                sync_dir = dirname(self.logger.experiment.dir)
+                sync_dir = dirname(self.logger.experiment.dir)  # type: ignore [attr-defined]
                 # 2. mark run complete
-                wandb.finish()  # type: ignore [attr-defined]
+                wandb.finish()  # type: ignore
                 # 3. call the sync command for the run directory
                 subprocess.check_call(["wandb", "sync", sync_dir])
