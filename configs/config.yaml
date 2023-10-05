@@ -4,9 +4,11 @@ trainer:
   logger:
     class_path: pytorch_lightning.loggers.WandbLogger
     init_args:
-      log_model: true
+      entity: causal-representation-learning
+      log_model: false
       project: lti_ica
       save_dir:
+      offline: true
   accelerator: auto
   strategy: auto
   devices: auto
