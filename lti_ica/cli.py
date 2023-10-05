@@ -31,18 +31,6 @@ class LTILightningCLI(LightningCLI):
         parser.link_arguments("data.use_B", "model.use_B")
         parser.link_arguments("data.use_C", "model.use_C")
 
-    def before_fit(self):
-        if isinstance(self.trainer.logger, WandbLogger) is True:
-            # required as the parser cannot parse the "-" symbol
-            self.trainer.logger.__dict__["_wandb_init"][
-                "entity"
-            ] = "causal-representation-learning"
-
-            if self.config[self.subcommand].model.offline is True:
-                self.trainer.logger.__dict__["_wandb_init"]["mode"] = "offline"
-            else:
-                self.trainer.logger.__dict__["_wandb_init"]["mode"] = "online"
-
 
 if __name__ == "__main__":
     cli = LTILightningCLI(
