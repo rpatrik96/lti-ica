@@ -14,7 +14,7 @@ parameters:
   seed_everything:
     values: [42, 64, 982, 5748, 23567]
   trainer.max_epochs:
-      value: 15000
+      value: 6000
   data.num_comp:
       values: [2, 3, 5, 8, 10]
   data.num_segment:
