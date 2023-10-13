@@ -28,7 +28,7 @@ parameters:
   model.offline:
     value: true
   model.triangular:
-    values: [false, true]
+    value: false
 
 
 
