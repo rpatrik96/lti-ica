@@ -34,13 +34,19 @@ class NonstationaryLTIDataset(Dataset):
         super().__init__()
         self.num_comp = num_comp
         self.num_data = num_data
-        self.num_segment = num_segment
         self.dt = dt
         self.triangular = triangular
         self.use_B = use_B
         self.zero_means = zero_means
         self.use_C = use_C
         self.max_variability = max_variability
+
+        if self.max_variability is True and num_segment != num_comp + 1:
+            print("Overwriting num_segment to construct a maximally variable system")
+            num_segment = num_comp + 1
+
+        self.num_segment = num_segment
+
         self.system_type = system_type
         self.ar_order = ar_order
 
