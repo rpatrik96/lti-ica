@@ -1,0 +1,36 @@
+command:
+  - ${env}
+  - python3
+  - lti_ica/cli.py
+  - fit
+  - "--config"
+  - "configs/config.yaml"
+  - ${args}
+method: grid
+metric:
+  goal: maximize
+  name: val_log_likelihood
+parameters:
+  seed_everything:
+    values: [42, 64, 982, 5748, 23567]
+  trainer.max_epochs:
+      value: 4000
+  data.num_comp:
+      values: [2, 3, 5, 8, 10]
+  data.max_variability:
+      value: true
+  data.zero_means:
+    value: false
+  data.use_B:
+    value: true
+  data.use_C:
+    value: true
+  model.offline:
+    value: true
+  model.triangular:
+    value: false
+
+
+
+
+
