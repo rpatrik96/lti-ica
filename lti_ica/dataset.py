@@ -51,7 +51,7 @@ class NonstationaryLTIDataset(Dataset):
         self.ar_order = ar_order
 
         # Remake label for TCL learning
-        self.num_data_per_segment = int(np.ceil(self.num_data / self.num_segment))
+        self.num_data_per_segment = self.num_data // self.num_segment
 
         # this ensures that after reshaping there is no overlap between segments in an observation tuple
         assert self.num_data_per_segment % (self.ar_order + 1) == 0
