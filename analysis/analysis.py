@@ -77,9 +77,8 @@ def sweep2df(
         #  We call ._json_dict to omit large files
         summary = run.summary._json_dict
 
-        if run.state == "finished" or (
-            "epoch" in summary.keys() and summary["epoch"] > 50
-        ):
+        if run.state == "finished":
+            # print(f"\t Processing {run.name}...")
             # try:
             if True:
                 # .config contains the hyperparameters.
@@ -90,15 +89,23 @@ def sweep2df(
                 num_segment = config["data.num_comp"]
                 use_B = config["data.use_B"]
                 use_C = config["data.use_C"]
-                max_variability = config["data.max_variability"]
+                try:
+                    max_variability = config["data.max_variability"]
+                except:
+                    max_variability = False
+
                 zero_means = config["data.zero_means"]
                 seed_everything = config["seed_everything"]
 
-                train_log_likelihood = summary["train_log_likelihood"]
-                train_mcc = summary["train_mcc"]
+                try:
+                    train_log_likelihood = summary["train_log_likelihood"]
+                    train_mcc = summary["train_mcc"]
 
-                val_log_likelihood = summary["val_log_likelihood"]
-                val_mcc = summary["val_mcc"]
+                    val_log_likelihood = summary["val_log_likelihood"]
+                    val_mcc = summary["val_mcc"]
+                except:
+                    print(f"Encountered a faulty run with ID {run.name}")
+                    continue
 
                 train_log_likelihood_history = run.history(
                     keys=[f"train_log_likelihood"]
