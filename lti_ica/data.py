@@ -67,6 +67,9 @@ def generate_nonstationary_data(
 
         _, segment_obs, segment_state = lti.simulate(segment_U, dt=dt)
 
+        assert np.all(np.isfinite(segment_obs))
+        assert np.all(np.isfinite(segment_state))
+
         obs.append(segment_obs)
         states.append(segment_state)
         controls.append(segment_U)
