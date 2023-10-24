@@ -74,7 +74,7 @@ class LTINetMLP(nn.Module):
 
         self.state_dim = state_dim
         self.control_dim = control_dim if control_dim is not None else state_dim
-        self.net = nn.Linear(2 * state_dim, control_dim, bias=False)
+        self.net = nn.Linear(2 * state_dim, self.control_dim, bias=False)
 
         torch.nn.init.orthogonal_(self.net.weight)
 
