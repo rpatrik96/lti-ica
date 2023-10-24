@@ -29,6 +29,7 @@ class LTILightning(pl.LightningModule):
         lr=1e-3,
         model="mlp",
         offline=True,
+        control_dim=None,
     ):
         super().__init__()
 
@@ -46,7 +47,9 @@ class LTILightning(pl.LightningModule):
                 B=self.hparams.use_B,
             )
         elif self.hparams.model == "mlp":
-            self.model = LTINetMLP(num_dim=self.hparams.num_comp)
+            self.model = LTINetMLP(
+                state_dim=self.hparams.num_comp, control_dim=self.hparams.control_dim
+            )
 
     def training_step(self, batch, batch_idx):
         (

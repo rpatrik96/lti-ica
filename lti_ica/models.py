@@ -64,16 +64,17 @@ class LTINet(nn.Module):
 
 
 class LTINetMLP(nn.Module):
-    def __init__(self, num_dim):
+    def __init__(self, state_dim, control_dim=None):
         """Network model for segment-wise stationary model for LTI systems
         Args:
-            num_dim: number of dimension
-            num_class: number of classes
+            state_dim: dimensionality of the (observed) state
+            control_dim: dimensionality of the control signal
         """
         super().__init__()
 
-        self.num_dim = num_dim
-        self.net = nn.Linear(2 * num_dim, num_dim, bias=False)
+        self.state_dim = state_dim
+        self.control_dim = control_dim if control_dim is not None else state_dim
+        self.net = nn.Linear(2 * state_dim, self.control_dim, bias=False)
 
         torch.nn.init.orthogonal_(self.net.weight)
 
@@ -83,4 +84,4 @@ class LTINetMLP(nn.Module):
             x: input [batch, time(t:t-p), dim]
         """
 
-        return self.net(x.reshape(-1, 2 * self.num_dim))
+        return self.net(x.reshape(-1, 2 * self.state_dim))

@@ -35,7 +35,7 @@ trainer:
   enable_model_summary: null
   accumulate_grad_batches: 1
   gradient_clip_val: 0.5
-  gradient_clip_algorithm: null
+  gradient_clip_algorithm: norm
   deterministic: null
   benchmark: null
   inference_mode: true
@@ -56,7 +56,7 @@ model:
 data:
   num_comp: 2
   num_data_per_segment: 12000
-  num_segment: 3
+  num_segment: 1
   dt: 0.003
   triangular: false
   use_B: true
