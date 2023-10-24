@@ -81,6 +81,7 @@ class NonstationaryLTIDataset(Dataset):
             self.num_segment,
             zero_means=self.zero_means,
             max_variability=self.max_variability,
+            control_dim=None if system_type == "lti" else self.lti.B.shape[1],
         )
 
         observations, states, controls = generate_nonstationary_data(
