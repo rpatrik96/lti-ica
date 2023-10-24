@@ -4,6 +4,25 @@ from state_space_models.state_space_models.lti import LTISystem
 import pytest
 
 
+@pytest.mark.parametrize("system_type", ["lti", "spring_mass_damper", "dc_motor"])
+def test_dataset_system_type(
+    system_type, num_comp, num_segment, num_data_per_segment, dt, ar_order
+):
+    if system_type is not "lti":
+        num_comp = 2
+        num_segment = num_comp + 1
+    num_data = num_data_per_segment * num_segment
+    dataset = NonstationaryLTIDataset(
+        num_comp,
+        num_data,
+        num_segment,
+        triangular=False,
+        dt=dt,
+        ar_order=ar_order,
+        system_type=system_type,
+    )
+
+
 @pytest.mark.parametrize("triangular", [True, False])
 def test_dataset_default_params(
     triangular, num_comp, num_segment, num_data_per_segment, dt, ar_order
