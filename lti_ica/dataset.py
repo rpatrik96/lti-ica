@@ -5,7 +5,11 @@ import numpy as np
 from lti_ica.data import generate_nonstationary_data, generate_segment_stats
 
 
-from state_space_models.state_space_models.lti import LTISystem, SpringMassDamper
+from state_space_models.state_space_models.lti import (
+    LTISystem,
+    SpringMassDamper,
+    DCMotor,
+)
 
 
 """Pytorch dataset for the data generated from nonstationary segments"""
@@ -67,6 +71,8 @@ class NonstationaryLTIDataset(Dataset):
             )
         elif system_type == "spring_mass_damper":
             self.lti = SpringMassDamper.from_params(dt=self.dt)
+        elif system_type == "dc_motor":
+            self.lti = DCMotor.from_params(dt=self.dt)
         else:
             raise ValueError(f"Unknown system type {system_type=}")
 
