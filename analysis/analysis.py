@@ -209,3 +209,11 @@ def sweep2df(
         val_log_likelihood_histories,
         val_mcc_histories,
     )
+
+
+def stats2string(df):
+    s = [
+        f"${m:.3f}\scriptscriptstyle\pm {s:.3f}$ & "
+        for m, s in zip(df.mean().train_mcc, df.std().train_mcc)
+    ]
+    return "".join(s)
