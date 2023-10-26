@@ -34,6 +34,7 @@ class NonstationaryLTIDataset(Dataset):
         use_C=True,
         system_type="lti",
         ar_order=1,
+        obs_noise_var=None,
     ):
         super().__init__()
         self.num_comp = num_comp
@@ -44,6 +45,7 @@ class NonstationaryLTIDataset(Dataset):
         self.zero_means = zero_means
         self.use_C = use_C
         self.max_variability = max_variability
+        self.obs_noise_var = np.array(obs_noise_var)
 
         if self.max_variability is True and num_segment != num_comp + 1:
             print("Overwriting num_segment to construct a maximally variable system")
@@ -90,6 +92,7 @@ class NonstationaryLTIDataset(Dataset):
             self.segment_variances,
             self.num_data_per_segment,
             self.dt,
+            self.obs_noise_var,
         )
 
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
