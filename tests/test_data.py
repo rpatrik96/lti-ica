@@ -39,13 +39,16 @@ def test_generate_segment_stats_max_variability(max_variability, num_comp, num_s
         assert np.all(segment_variances_copy == 0.0001)
 
 
-def test_generate_nonstationary_data(num_comp, num_segment, num_data_per_segment, dt):
+@pytest.mark.parametrize("obs_noise_var", [0, 0.1])
+def test_generate_nonstationary_data(
+    num_comp, num_segment, num_data_per_segment, dt, obs_noise_var
+):
     segment_means, segment_variances = generate_segment_stats(
         num_comp, num_segment, zero_means=False, max_variability=False
     )
     lti = LTISystem.controllable_system(num_comp, num_comp, dt=dt)
     obs, states, control = generate_nonstationary_data(
-        lti, segment_means, segment_variances, num_data_per_segment, dt
+        lti, segment_means, segment_variances, num_data_per_segment, dt, obs_noise_var
     )
     assert obs.shape == (num_data_per_segment * num_segment, num_comp)
     assert states.shape == (num_data_per_segment * num_segment, num_comp)

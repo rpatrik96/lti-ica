@@ -1,0 +1,28 @@
+command:
+  - ${env}
+  - python3
+  - lti_ica/cli.py
+  - fit
+  - "--config"
+  - "configs/config.yaml"
+  - "--config"
+  - "configs/dc_motor.yaml"
+  - ${args}
+method: grid
+metric:
+  goal: maximize
+  name: val_log_likelihood
+parameters:
+  seed_everything:
+    values: [42, 64, 982, 5748, 23567]
+  data.zero_means:
+    values: [false, true]
+  data.obs_noise_var:
+    values: [null, 1e-4, 1e-3, 1e-2, 1e-1]
+  model.offline:
+    value: true
+
+
+
+
+

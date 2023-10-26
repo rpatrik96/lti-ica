@@ -21,6 +21,7 @@ class NonstationaryLTIDatamodule(pl.LightningDataModule):
         system_type="lti",
         ar_order=1,
         batch_size=64,
+        obs_noise_var=0,
     ):
         super().__init__()
         self.save_hyperparameters()
@@ -50,6 +51,7 @@ class NonstationaryLTIDatamodule(pl.LightningDataModule):
             max_variability=self.hparams.max_variability,
             system_type=self.hparams.system_type,
             ar_order=self.hparams.ar_order,
+            obs_noise_var=self.hparams.obs_noise_var,
         )
 
     def train_dataloader(self):

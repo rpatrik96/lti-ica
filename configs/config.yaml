@@ -35,7 +35,7 @@ trainer:
   enable_model_summary: null
   accumulate_grad_batches: 1
   gradient_clip_val: 0.5
-  gradient_clip_algorithm: norm
+  gradient_clip_algorithm: null
   deterministic: null
   benchmark: null
   inference_mode: true
@@ -66,6 +66,7 @@ data:
   system_type: lti
   ar_order: 1
   batch_size: 64
+  obs_noise_var: 0
 notes: null
 tags: null
 ckpt_path: null
