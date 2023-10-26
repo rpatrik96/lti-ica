@@ -18,7 +18,7 @@ parameters:
   data.zero_means:
     values: [false, true]
   data.obs_noise_var:
-    values: [null, 1e-4, 1e-3, 1e-2, 1e-1]
+    values: [0, 1e-4, 1e-3, 1e-2, 1e-1]
   model.offline:
     value: true
 
