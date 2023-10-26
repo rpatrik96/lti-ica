@@ -50,7 +50,7 @@ def generate_segment_stats(
 
 
 def generate_nonstationary_data(
-    lti, segment_means, segment_variances, num_data_per_segment, dt, obs_noise_var=None
+    lti, segment_means, segment_variances, num_data_per_segment, dt, obs_noise_var=0
 ):
     # iterate over the segment variances,
     # generate multivariate normal with each variance,
@@ -70,7 +70,7 @@ def generate_nonstationary_data(
         assert np.all(np.isfinite(segment_obs))
         assert np.all(np.isfinite(segment_state))
 
-        if obs_noise_var is not None:
+        if obs_noise_var != 0:
             segment_obs += np.random.multivariate_normal(
                 np.zeros(obs_dim := segment_obs.shape[1]),
                 np.sqrt(obs_noise_var) * np.eye(obs_dim),

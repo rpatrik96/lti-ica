@@ -21,7 +21,7 @@ class NonstationaryLTIDatamodule(pl.LightningDataModule):
         system_type="lti",
         ar_order=1,
         batch_size=64,
-        obs_noise_var=None,
+        obs_noise_var=0,
     ):
         super().__init__()
         self.save_hyperparameters()

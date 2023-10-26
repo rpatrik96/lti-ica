@@ -34,7 +34,7 @@ class NonstationaryLTIDataset(Dataset):
         use_C=True,
         system_type="lti",
         ar_order=1,
-        obs_noise_var=None,
+        obs_noise_var=0,
     ):
         super().__init__()
         self.num_comp = num_comp

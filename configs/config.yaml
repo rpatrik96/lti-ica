@@ -66,7 +66,7 @@ data:
   system_type: lti
   ar_order: 1
   batch_size: 64
-  obs_noise_var: null
+  obs_noise_var: 0
 notes: null
 tags: null
 ckpt_path: null

@@ -39,7 +39,7 @@ def test_generate_segment_stats_max_variability(max_variability, num_comp, num_s
         assert np.all(segment_variances_copy == 0.0001)
 
 
-@pytest.mark.parametrize("obs_noise_var", [None, 0.1])
+@pytest.mark.parametrize("obs_noise_var", [0, 0.1])
 def test_generate_nonstationary_data(
     num_comp, num_segment, num_data_per_segment, dt, obs_noise_var
 ):
