@@ -18,7 +18,7 @@ parameters:
   data.num_comp:
       values: [2, 3, 5]
   data.max_variability:
-      value: false
+      value: true
   data.zero_means:
     value: false
   data.obs_noise_var:
