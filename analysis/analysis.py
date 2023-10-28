@@ -94,7 +94,12 @@ def sweep2df(
                 except:
                     max_variability = False
 
-                zero_means = config["data.zero_means"]
+                try:
+                    obs_noise_var = config["obs_noise_var"]
+                except:
+                    obs_noise_var = 0
+
+                zero_means = config["zero_means"]
                 seed_everything = config["seed_everything"]
 
                 try:
@@ -159,6 +164,7 @@ def sweep2df(
                         use_C,
                         max_variability,
                         zero_means,
+                        obs_noise_var,
                     ]
                 )
 
@@ -184,6 +190,7 @@ def sweep2df(
             "use_C",
             "max_variability",
             "zero_means",
+            "obs_noise_var",
         ],
     ).fillna(0)
 
@@ -209,3 +216,11 @@ def sweep2df(
         val_log_likelihood_histories,
         val_mcc_histories,
     )
+
+
+def stats2string(df):
+    s = [
+        f"${m:.3f}\scriptscriptstyle\pm {s:.3f}$ & "
+        for m, s in zip(df.mean().train_mcc, df.std().train_mcc)
+    ]
+    return "".join(s)
