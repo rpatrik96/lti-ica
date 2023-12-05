@@ -4,6 +4,8 @@
  
 # An Interventional Perspective on Identifiability in Gaussian LTI Systems with Independent Component Analysis
 
+[![Paper](http://img.shields.io/badge/arxiv-cs.LG:2311.18048-B31B1B.svg)](https://arxiv.org/abs/2311.18048)
+
 [![Conference](http://img.shields.io/badge/CI4TS@UAI-2023.svg)](https://sites.google.com/view/ci4ts2023/accepted-papers?authuser=0)
 
 ![CI testing](https://github.com/rpatrik96/lti-ica/workflows/CI%20testing/badge.svg?branch=main&event=push)
