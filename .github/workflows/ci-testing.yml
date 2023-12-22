@@ -32,19 +32,8 @@ jobs:
       uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
-
-    - name: Get pip cache dir
-      id: pip-cache
-      run: echo "dir=$(pip cache dir)" >> $GITHUB_OUTPUT
-
-    - name: Cache pip
-      uses: actions/cache@v3
-      with:
-        path: ${{ steps.pip-cache.outputs.dir }}
-        key: ${{ runner.os }}-pip-py${{ matrix.python-version }}-${{ matrix.requires }}-${{ hashFiles('requirements.txt') }}-${{ hashFiles('requirements/modules.txt') }}
-        restore-keys: |
-          ${{ runner.os }}-pip-py${{ matrix.python-version }}-${{ matrix.requires }}-
-
+        cache: 'pip' # caching pip dependencies
+    
     - name: Install dependencies
       run: |
         pip install --requirement state_space_models/requirements.txt --upgrade --quiet
